@@ -1,38 +1,324 @@
-.App {
+/* Import Google Fonts */
+@import url("https://fonts.googleapis.com/css?family=DM+Serif+Display:400,400i|Gothic+A1:300,400,500,600,700,800&display=swap");
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+  line-height: 1.15;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Gothic A1", sans-serif;
+  font-size: 1.8rem;
+  line-height: 1.778;
+  color: #000000;
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 700;
+  color: #000000;
+  margin: 0;
+}
+
+h1 {
+  font-size: 3.6rem;
+  line-height: 1.222;
+}
+
+h2 {
+  font-size: 3.2rem;
+  line-height: 1.25;
+}
+
+h3 {
+  font-size: 2.4rem;
+  line-height: 1.167;
+}
+
+h4 {
+  font-size: 2.1rem;
+  line-height: 1.333;
+}
+
+h5 {
+  font-size: 1.8rem;
+  line-height: 1.333;
+}
+
+h6 {
+  font-size: 1.6rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: .3rem;
+}
+
+p {
+  margin: 0 0 3.2rem 0;
+}
+
+a {
+  color: #8dc63f;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+a:hover,
+a:focus,
+a:active {
+  color: #33648a;
+}
+
+/* Animations */
+@keyframes dots-fade {
+  0% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.2;
+  }
+  80% {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-10px) translateX(-5px);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translateY(-30px) translateX(15px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.3;
+  }
+}
+
+@keyframes particleGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(0, 100%, 0);
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Preloader animations */
+html.ss-preload .intro-content__text,
+html.ss-preload .intro-content__bottom {
+  opacity: 0;
+}
+
+html.ss-loaded .intro-content__text {
+  animation-name: fadeInLeft;
+  animation-duration: 3s;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  animation-fill-mode: both;
+}
+
+html.ss-loaded .intro-content__bottom {
+  animation-name: fadeIn;
+  animation-duration: 3s;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  animation-delay: 1.5s;
+  animation-fill-mode: both;
+}
+
+html.no-csstransitions .intro-content__text,
+html.no-csstransitions .intro-content__bottom {
+  opacity: 1;
+}
+
+/* Button styles */
+.btn {
+  display: inline-block;
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: .6rem;
+  height: 6rem;
+  line-height: 5.6rem;
+  padding: 0 3.2rem;
+  margin: 0 .4rem 1.6rem 0;
+  color: #ffffff;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all .3s ease-in-out;
+  border-radius: 4px;
+  background-color: #272727;
+  border: 0.2rem solid #272727;
+}
+
+.btn:hover,
+.btn:focus {
+  background-color: #000000;
+  border-color: #000000;
+  color: #ffffff;
+  outline: 0;
+}
+
+.btn--primary {
+  background: #8dc63f;
+  border-color: #8dc63f;
+  color: #ffffff;
+}
+
+.btn--primary:hover,
+.btn--primary:focus {
+  background: #000000;
+  border-color: #000000;
+}
+
+.btn--stroke {
+  background: transparent !important;
+  border: 0.2rem solid #000000;
+  color: #000000;
+}
+
+.btn--stroke:hover {
+  background: #000000 !important;
+  border: 0.2rem solid #000000;
+  color: #ffffff;
+}
+
+.btn--small {
+  height: 5.6rem !important;
+  line-height: 5.2rem !important;
+}
+
+.h-full-width {
+  width: 100%;
+  margin-right: 0;
+}
+
+/* Form styles */
+input[type="email"],
+input[type="text"],
+textarea {
+  display: block;
+  height: 6.4rem;
+  padding: 1.5rem 24px 1.5rem;
+  border: 0;
+  outline: none;
+  color: #000000;
+  font-family: "Gothic A1", sans-serif;
+  font-size: 1.5rem;
+  line-height: 3.2rem;
+  max-width: 100%;
+  background-color: #e0e0e0;
+  border: 1px solid transparent;
+  transition: all .3s ease-in-out;
+  border-radius: 4px;
+}
+
+input[type="email"]:focus,
+input[type="text"]:focus,
+textarea:focus {
+  color: #000000;
+  box-shadow: 0 0 5px rgba(141, 198, 63, 0.8);
+  border: 1px solid #8dc63f;
+}
+
+/* Utility classes */
+.h-text-center {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.h-add-half-bottom {
+  margin-bottom: 1.6rem !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Responsive design */
+@media screen and (max-width: 1200px) {
+  html {
+    font-size: 9.444444444444444px;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 3.3rem;
   }
-  to {
-    transform: rotate(360deg);
+  
+  h1, h2, h3, h4 {
+    margin-top: 5.6rem;
+  }
+  
+  h5, h6 {
+    margin-top: 4.4rem;
+    margin-bottom: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  html {
+    font-size: 9.444444444444444px;
   }
 }
