@@ -367,6 +367,93 @@ const LoadingText = styled.div`
   }
 `;
 
+const CaptionContainer = styled.div<{ show: boolean }>`
+  position: absolute;
+  z-index: 4;
+  opacity: ${props => props.show ? 1 : 0};
+  transition: opacity 0.3s ease;
+
+  @media screen and (max-width: 800px) {
+    bottom: 10rem;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 90%;
+    text-align: center;
+  }
+
+  @media screen and (min-width: 801px) {
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 300px;
+    text-align: left;
+    
+    &.left {
+      left: 2rem;
+    }
+    
+    &.right {
+      right: 2rem;
+    }
+  }
+`;
+
+const CaptionText = styled.div`
+  color: white;
+  font-family: "Gothic A1", sans-serif;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+  word-wrap: break-word;
+  transition: all 0.3s ease;
+
+  @media screen and (max-width: 800px) {
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+
+  @media screen and (min-width: 801px) {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    font-weight: 800;
+  }
+`;
+
+const CurrentWord = styled.span`
+  background: rgba(141, 198, 63, 0.3);
+  padding: 2px 4px;
+  border-radius: 4px;
+  animation: wordHighlight 0.3s ease;
+`;
+
+const wordHighlight = keyframes`
+  0% {
+    background: rgba(141, 198, 63, 0.6);
+    transform: scale(1.05);
+  }
+  100% {
+    background: rgba(141, 198, 63, 0.3);
+    transform: scale(1);
+  }
+`;
+
+const CaptionLine = styled.div`
+  margin-bottom: 0.5rem;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const TalkPage: React.FC = () => {
   const [showGlow, setShowGlow] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
@@ -377,11 +464,18 @@ const TalkPage: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [currentAudioUrl, setCurrentAudioUrl] = useState('/audio.mp3');
+  const [captionText, setCaptionText] = useState('');
+  const [showCaption, setShowCaption] = useState(false);
+  const [wordDurations, setWordDurations] = useState<any[]>([]);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const particlesRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const recognitionRef = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const captionIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioStartTimeRef = useRef<number | null>(null);
+  const wordDurationsRef = useRef<any[]>([]);
 
   useEffect(() => {
     // Prevent scrolling and fix mobile viewport issues
@@ -415,6 +509,10 @@ const TalkPage: React.FC = () => {
 
     return () => {
       clearTimeout(videoTimer);
+      // Clean up caption sync interval
+      if (captionIntervalRef.current) {
+        clearInterval(captionIntervalRef.current);
+      }
       // Reset body styles on cleanup
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
@@ -578,6 +676,18 @@ const TalkPage: React.FC = () => {
         videoElement.currentTime = 0;
         setIsVideoPlaying(false);
         setIsAudioPlaying(false);
+        // Stop caption sync when audio ends
+        if (captionIntervalRef.current) {
+          clearInterval(captionIntervalRef.current);
+          captionIntervalRef.current = null;
+        }
+        
+        // Hide caption when audio ends
+        setTimeout(() => {
+          setShowCaption(false);
+          setCaptionText('');
+          setCurrentWordIndex(0);
+        }, 2000); // Keep caption visible for 2 seconds after audio ends
       };
       
       audioElement.addEventListener('ended', handleAudioEnd);
@@ -673,26 +783,39 @@ const TalkPage: React.FC = () => {
       // Set crossOrigin for CORS
       audioRef.current.crossOrigin = 'anonymous';
       
+      // Add event listeners for audio state tracking
+      audioRef.current.onplay = () => {
+        setIsAudioPlaying(true);
+        
+        // Start caption sync when audio actually starts playing
+        setTimeout(() => {
+          startCaptionSync();
+        }, 200);
+      };
+      
+      audioRef.current.onpause = () => {
+        setIsAudioPlaying(false);
+      };
+      
       // Wait for audio to be ready before playing
       const playAudio = () => {
         if (audioRef.current && audioRef.current.readyState >= 2) {
-          console.log('Audio ready, attempting to play');
           audioRef.current.currentTime = 0;
           audioRef.current.play()
             .then(() => {
-              console.log('Audio started successfully');
               setIsAudioPlaying(true);
+              
+              // Fallback: If onplay event didn't fire, start caption sync manually
+              setTimeout(() => {
+                if (wordDurations.length > 0 && !captionIntervalRef.current) {
+                  startCaptionSync();
+                }
+              }, 200);
             })
             .catch(error => {
               console.error('Error starting audio:', error);
-              console.error('Audio error details:', {
-                name: error.name,
-                message: error.message,
-                code: (error as any).code
-              });
             });
         } else {
-          console.log('Audio not ready yet, waiting...');
           // Wait a bit and try again
           setTimeout(playAudio, 100);
         }
@@ -700,9 +823,64 @@ const TalkPage: React.FC = () => {
       
       // Start trying to play audio
       playAudio();
+      
+      // Caption sync will be started by the audio onplay event or fallback timer
     } else {
       console.log('Video or audio ref is null');
     }
+  };
+
+  const startCaptionSync = () => {
+    const currentWordDurations = wordDurationsRef.current;
+    
+    if (captionIntervalRef.current) {
+      clearInterval(captionIntervalRef.current);
+    }
+    
+    setCurrentWordIndex(0);
+    setShowCaption(true);
+    
+    captionIntervalRef.current = setInterval(() => {
+      const intervalWordDurations = wordDurationsRef.current;
+      if (intervalWordDurations.length > 0 && audioRef.current) {
+        const currentTime = audioRef.current.currentTime * 1000; // Convert to milliseconds
+        const isPaused = audioRef.current.paused;
+        
+        if (!isPaused && currentTime > 0) {
+          // Find the current word based on audio time
+          let newWordIndex = 0;
+          
+          // Find the word that should be playing right now
+          for (let i = 0; i < intervalWordDurations.length; i++) {
+            if (currentTime >= intervalWordDurations[i].startMs) {
+              if (currentTime <= intervalWordDurations[i].endMs) {
+                // We're exactly in this word's time range
+                newWordIndex = i;
+                break;
+              } else {
+                // We've passed this word, continue to find the right one
+                newWordIndex = i;
+              }
+            } else {
+              // We haven't reached this word yet, use previous word
+              break;
+            }
+          }
+          
+          // Ensure we don't go beyond array bounds
+          if (newWordIndex >= intervalWordDurations.length) {
+            newWordIndex = intervalWordDurations.length - 1;
+          }
+          
+          if (newWordIndex !== currentWordIndex) {
+            setCurrentWordIndex(newWordIndex);
+          }
+        } else if (currentWordIndex !== 0) {
+          // Audio not playing or at start, show first word
+          setCurrentWordIndex(0);
+        }
+      }
+    }, 100); // Check every 100ms
   };
 
   const stopVideoAndAudio = () => {
@@ -716,6 +894,20 @@ const TalkPage: React.FC = () => {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       setIsAudioPlaying(false);
+      
+      // Stop caption sync
+      if (captionIntervalRef.current) {
+        clearInterval(captionIntervalRef.current);
+        captionIntervalRef.current = null;
+      }
+      
+      // Reset audio start time
+      audioStartTimeRef.current = null;
+      
+      // Hide caption
+      setShowCaption(false);
+      setCaptionText('');
+      setCurrentWordIndex(0);
     }
   };
 
@@ -753,6 +945,24 @@ const TalkPage: React.FC = () => {
       if (result.audioFile) {
         console.log('Audio URL received:', result.audioFile);
         setCurrentAudioUrl(result.audioFile);
+        
+        // Set word durations for real-time captions
+        if (result.wordDurations && result.wordDurations.length > 0) {
+          setWordDurations(result.wordDurations);
+          wordDurationsRef.current = result.wordDurations; // Keep ref in sync
+          setCurrentWordIndex(0);
+          setShowCaption(true);
+          console.log('Word durations set:', result.wordDurations.length, 'words');
+          console.log('First few words:', result.wordDurations.slice(0, 5));
+        }
+        
+        // Set caption text from API response (AI's response, not user input)
+        if (result.transcript || result.text || result.caption || result.response) {
+          const captionContent = result.transcript || result.text || result.caption || result.response || '';
+          setCaptionText(captionContent);
+          setShowCaption(true);
+          console.log('AI Response Caption set:', captionContent);
+        }
         
         // Test if audio URL is accessible
         try {
@@ -795,7 +1005,9 @@ const TalkPage: React.FC = () => {
       // Stop any current playback first
       stopVideoAndAudio();
       
-      // Call API to get AI audio
+      // Don't show user input as caption, wait for AI response
+      
+      // Call API to get AI audio and caption
       await callAudioAssistant(textToSend);
       
       // Wait a bit for audio to load, then start video and audio
@@ -883,6 +1095,8 @@ const TalkPage: React.FC = () => {
               // Stop any current playback first
               stopVideoAndAudio();
               
+              // Don't show user transcript as caption, wait for AI response
+              
               // For voice input, we'll send the transcript as text to the API
               await callAudioAssistant(currentTranscript);
               
@@ -906,6 +1120,8 @@ const TalkPage: React.FC = () => {
               
               // Stop any current playback first
               stopVideoAndAudio();
+              
+              // Don't show user transcript as caption, wait for AI response
               
               // For voice input, we'll send the transcript as text to the API
               await callAudioAssistant(currentTranscript);
@@ -977,6 +1193,45 @@ const TalkPage: React.FC = () => {
         preload="auto"
       />
       
+      <CaptionContainer show={showCaption} className="left">
+        <CaptionText>
+          <>
+            {wordDurations.length > 0 ? (
+              // Show real-time word-by-word captions
+              <>
+                {wordDurations.slice(currentWordIndex, Math.min(currentWordIndex + 5, wordDurations.length)).map((wordData, index) => {
+                  const isCurrentWord = index === 0;
+                  const actualIndex = currentWordIndex + index;
+                  
+                  return (
+                    <span key={actualIndex}>
+                      {isCurrentWord ? (
+                        <CurrentWord>{wordData.word}</CurrentWord>
+                      ) : (
+                        <span style={{opacity: 0.7}}>{wordData.word}</span>
+                      )}
+                      {index < 4 && actualIndex + 1 < wordDurations.length ? ' ' : ''}
+                    </span>
+                  );
+                })}
+              </>
+            ) : captionText ? (
+              // Fallback to regular caption text
+              <>
+                <div style={{fontSize: '0.8rem', color: 'yellow', marginBottom: '5px'}}>
+                  DEBUG: Regular caption
+                </div>
+                {captionText.split('\n').map((line, index) => (
+                  <CaptionLine key={index}>{line}</CaptionLine>
+                ))}
+              </>
+            ) : (
+              <div style={{color: 'red'}}>No caption data available</div>
+            )}
+          </>
+        </CaptionText>
+      </CaptionContainer>
+
       <InputContainer>
         <ModernInput>
           <TextInput
