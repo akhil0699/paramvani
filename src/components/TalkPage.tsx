@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Button } from './ui/neon-button';
-import { Mic, MicOff } from 'lucide-react';
+import { Mic, MicOff, Send } from 'lucide-react';
 
 const glowAnimation = keyframes`
   0% {
@@ -350,6 +350,59 @@ const MicButton = styled.button<{ isListening: boolean; disabled?: boolean }>`
   }
 `;
 
+const SubmitButton = styled.button<{ disabled?: boolean }>`
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  border: 2px solid rgba(76, 175, 80, 0.8);
+  opacity: ${props => props.disabled ? 0.6 : 1};
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: white;
+  flex-shrink: 0;
+  margin-left: 5px;
+  position: relative;
+  z-index: 10;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    background: ${props => props.disabled ? 
+      'linear-gradient(135deg, #4CAF50, #45a049)' : 
+      'linear-gradient(135deg, #5CBF60, #4CAF50)'};
+    border-color: ${props => props.disabled ? 
+      'rgba(76, 175, 80, 0.8)' : 
+      'rgba(76, 175, 80, 1)'};
+    transform: ${props => props.disabled ? 'none' : 'scale(1.05)'};
+  }
+
+  &:active {
+    transform: ${props => props.disabled ? 'none' : 'scale(0.95)'};
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  @media screen and (max-width: 600px) {
+    width: 28px;
+    height: 28px;
+    
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+`;
+
 const LoadingText = styled.div`
   position: absolute;
   bottom: 12rem;
@@ -377,14 +430,14 @@ const CaptionContainer = styled.div<{ show: boolean }>`
     bottom: 10rem;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 90%;
+    max-width: 95%;
     text-align: center;
   }
 
   @media screen and (min-width: 801px) {
     top: 50%;
     transform: translateY(-50%);
-    max-width: 300px;
+    max-width: 400px;
     text-align: left;
     
     &.left {
@@ -406,12 +459,12 @@ const CaptionText = styled.div`
   transition: all 0.3s ease;
 
   @media screen and (max-width: 800px) {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     line-height: 1.5;
   }
 
   @media screen and (min-width: 801px) {
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     line-height: 1.6;
     font-weight: 800;
   }
@@ -682,12 +735,11 @@ const TalkPage: React.FC = () => {
           captionIntervalRef.current = null;
         }
         
-        // Hide caption when audio ends
-        setTimeout(() => {
-          setShowCaption(false);
-          setCaptionText('');
-          setCurrentWordIndex(0);
-        }, 2000); // Keep caption visible for 2 seconds after audio ends
+        // Clear caption display
+        setShowCaption(false);
+        setCurrentWordIndex(0);
+        setCaptionText('');
+        
       };
       
       audioElement.addEventListener('ended', handleAudioEnd);
@@ -874,6 +926,15 @@ const TalkPage: React.FC = () => {
           
           if (newWordIndex !== currentWordIndex) {
             setCurrentWordIndex(newWordIndex);
+          }
+          
+          // Check if we've reached the end of all words
+          const lastWordEndTime = intervalWordDurations[intervalWordDurations.length - 1]?.endMs || 0;
+          if (currentTime > lastWordEndTime) {
+            // Audio has finished playing all words, hide caption
+            setShowCaption(false);
+            setCurrentWordIndex(0);
+            setCaptionText('');
           }
         } else if (currentWordIndex !== 0) {
           // Audio not playing or at start, show first word
@@ -1237,26 +1298,40 @@ const TalkPage: React.FC = () => {
           <TextInput
             ref={inputRef}
             type="text"
-            placeholder={isGeneratingAudio ? "Generating AI audio..." : "Type your message or use voice..."}
+            placeholder={isGeneratingAudio ? "Connecting to god..." : "Type your message or use voice..."}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={handleKeyPress}
             disabled={isGeneratingAudio}
           />
-          <MicButton 
-            isListening={isListening || isGeneratingAudio}
-            onClick={handleSpeak}
-            type="button"
-            disabled={isGeneratingAudio}
-          >
-            {isGeneratingAudio ? (
-              <div style={{width: '16px', height: '16px', border: '2px solid #8dc63f', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite'}} />
-            ) : isListening ? (
-              <MicOff />
-            ) : (
-              <Mic />
-            )}
-          </MicButton>
+          {inputText.trim() ? (
+            <SubmitButton 
+              onClick={handleTextSubmit}
+              type="button"
+              disabled={isGeneratingAudio}
+            >
+              {isGeneratingAudio ? (
+                <div style={{width: '16px', height: '16px', border: '2px solid white', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite'}} />
+              ) : (
+                <Send />
+              )}
+            </SubmitButton>
+          ) : (
+            <MicButton 
+              isListening={isListening || isGeneratingAudio}
+              onClick={handleSpeak}
+              type="button"
+              disabled={isGeneratingAudio}
+            >
+              {isGeneratingAudio ? (
+                <div style={{width: '16px', height: '16px', border: '2px solid #8dc63f', borderTop: '2px solid transparent', borderRadius: '50%', animation: 'spin 1s linear infinite'}} />
+              ) : isListening ? (
+                <MicOff />
+              ) : (
+                <Mic />
+              )}
+            </MicButton>
+          )}
         </ModernInput>
       </InputContainer>
     </STalkPage>
