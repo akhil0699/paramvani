@@ -991,7 +991,7 @@ const TalkPage: React.FC = () => {
         throw new Error('No input provided');
       }
       
-      const response = await fetch('https://paramvani123.app.n8n.cloud/webhook/audio-assistant', {
+      const response = await fetch('https://santa0603.app.n8n.cloud/webhook/audio-assistant', {
         method: 'POST',
         body: formData,
       });
