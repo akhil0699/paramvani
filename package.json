@@ -10,7 +10,7 @@
     "@types/gsap": "^1.20.2",
     "@types/jest": "^27.5.2",
     "@types/jquery": "^3.5.33",
-    "@types/node": "^16.18.126",
+    "@types/node": "^20.0.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@types/react-router-dom": "^5.3.3",
@@ -29,7 +29,8 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.1",
-    "react-scripts": "5.0.1",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1",
@@ -39,10 +40,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "eslintConfig": {
     "extends": [
