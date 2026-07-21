@@ -190,14 +190,14 @@ const Header: React.FC = () => {
   const { user, profile, signOut } = useAuth();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
+  const expiry = profile?.subscriptionExpiry ?? 0;
   const isUnlimited = 
     profile?.subscriptionType !== "free" && 
     profile?.subscriptionType !== undefined &&
-    profile?.subscriptionExpiry !== undefined &&
-    profile.subscriptionExpiry > Date.now();
+    expiry > Date.now();
 
-  const remainingDays = isUnlimited && profile?.subscriptionExpiry 
-    ? Math.ceil((profile.subscriptionExpiry - Date.now()) / (1000 * 60 * 60 * 24))
+  const remainingDays = isUnlimited && expiry > 0
+    ? Math.ceil((expiry - Date.now()) / (1000 * 60 * 60 * 24))
     : 0;
 
   return (
