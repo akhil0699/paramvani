@@ -1,12 +1,14 @@
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import Header from './Header';
 import Preloader from './Preloader';
 import Modal from './Modal';
 import SocialLinks from './SocialLinks';
 import ScrollLinkComponent from './ScrollLink';
 import InfoSection from './InfoSection';
+import { useAuth } from '@/context/AuthContext';
 
 const SIntro = styled.section`
   width: 100%;
@@ -463,7 +465,17 @@ const ParticlesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const particlesRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { user, signInWithGoogle } = useAuth();
+
+  const handleConnect = async () => {
+    if (user) {
+      router.push('/choose');
+    } else {
+      await signInWithGoogle();
+      router.push('/choose');
+    }
+  };
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -631,7 +643,7 @@ const ParticlesPage: React.FC = () => {
               </IntroText>
 
               <IntroBottom>
-                <NotifyButton onClick={() => navigate('/talk')}>
+                <NotifyButton onClick={handleConnect}>
                 Connect Now
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <path d="M24 12l-9-9v7h-15v4h15v7z"/>

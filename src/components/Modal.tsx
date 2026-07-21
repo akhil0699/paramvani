@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-const ModalOverlay = styled.div<{ isOpen: boolean }>`
+const ModalOverlay = styled.div<{ $isOpen: boolean }>`
   z-index: 400;
   height: 100%;
   width: 100%;
@@ -10,11 +10,11 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   text-align: center;
   color: rgba(0, 0, 0, 0.7);
   background-color: rgba(0, 0, 0, 0.8);
-  opacity: ${props => props.isOpen ? 1 : 0};
-  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
-  transform: ${props => props.isOpen ? 'scale(1)' : 'scale(1.1)'};
-  transition: visibility 0s linear ${props => props.isOpen ? '0s' : '0.3s'}, 
-              opacity 0.3s ${props => props.isOpen ? '0s' : '0s'}, 
+  opacity: ${props => props.$isOpen ? 1 : 0};
+  visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
+  transform: ${props => props.$isOpen ? 'scale(1)' : 'scale(1.1)'};
+  transition: visibility 0s linear ${props => props.$isOpen ? '0s' : '0.3s'}, 
+              opacity 0.3s ${props => props.$isOpen ? '0s' : '0s'}, 
               transform 0.3s;
   overflow-y: auto;
   position: fixed;
@@ -169,7 +169,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <ModalOverlay isOpen={isOpen} onClick={handleOverlayClick}>
+    <ModalOverlay $isOpen={isOpen} onClick={handleOverlayClick}>
       <ModalInner>
         <CloseButton onClick={onClose} />
         

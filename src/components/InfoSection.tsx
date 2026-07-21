@@ -234,8 +234,8 @@ const TabContent = styled.div`
   }
 `;
 
-const TabContentItem = styled.div<{ isActive: boolean }>`
-  display: ${props => props.isActive ? 'block' : 'none'};
+const TabContentItem = styled.div<{ $isActive: boolean }>`
+  display: ${props => props.$isActive ? 'block' : 'none'};
 `;
 
 const Lead = styled.p`
@@ -560,7 +560,7 @@ const InfoSection: React.FC = () => {
           </TabNav>
 
           <TabContent>
-            <TabContentItem isActive={activeTab === 'tab-about'}>
+            <TabContentItem $isActive={activeTab === 'tab-about'}>
               <Row>
                 <Column>
                   <h1>Hello. We are Paramvani.</h1>
@@ -582,7 +582,7 @@ const InfoSection: React.FC = () => {
 
             </TabContentItem>
 
-            <TabContentItem isActive={activeTab === 'tab-services'}>
+            <TabContentItem $isActive={activeTab === 'tab-services'}>
               <Row>
                 <Column>
                   <h1>What we do.</h1>
@@ -640,7 +640,7 @@ const InfoSection: React.FC = () => {
               </ServicesList>
             </TabContentItem>
 
-            <TabContentItem isActive={activeTab === 'tab-contact'}>
+            <TabContentItem $isActive={activeTab === 'tab-contact'}>
               <Row>
                 <Column>
                   <h1>Get In Touch With Us.</h1>
@@ -676,13 +676,13 @@ const InfoSection: React.FC = () => {
                     </Column>
                   </Row>
 
-                  <p>
+                  <div>
                     <ContactEmail href="mailto:hello@paramvani.com">hello@paramvani.com</ContactEmail>
                     <ContactNumber>
                       <a href="tel:197-543-2345">+197 543 2345</a>
                       <a href="tel:123-456-9000">+123 456 9000</a>
                     </ContactNumber>
-                  </p>
+                  </div>
                 </Column>
               </Row>
             </TabContentItem>

@@ -24,7 +24,7 @@ const IntroSlider = styled.div`
   height: 100%;
 `;
 
-const IntroSliderImg = styled.div<{ isActive: boolean; opacity: number }>`
+const IntroSliderImg = styled.div<{ $isActive: boolean; opacity: number }>`
   background-repeat: no-repeat;
   background-position: 50% 50%;
   background-size: cover;
@@ -34,7 +34,7 @@ const IntroSliderImg = styled.div<{ isActive: boolean; opacity: number }>`
   top: 0;
   left: 0;
   width: 100%;
-  opacity: ${props => props.isActive ? 1 : 0};
+  opacity: ${props => props.$isActive ? 1 : 0};
   transition: opacity 3s ease-in-out;
 
   &::before {
@@ -394,7 +394,7 @@ const SlidesPage: React.FC = () => {
           {slides.map((slide, index) => (
             <IntroSliderImg
               key={index}
-              isActive={index === currentSlide}
+              $isActive={index === currentSlide}
               opacity={slide.opacity}
               style={{ backgroundImage: `url(${slide.image})` }}
             />
