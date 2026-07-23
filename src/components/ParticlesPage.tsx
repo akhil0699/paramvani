@@ -8,7 +8,7 @@ import Modal from './Modal';
 import SocialLinks from './SocialLinks';
 import ScrollLinkComponent from './ScrollLink';
 import InfoSection from './InfoSection';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, POST_LOGIN_REDIRECT_KEY } from '@/context/AuthContext';
 
 const SIntro = styled.section`
   width: 100%;
@@ -467,15 +467,36 @@ const ParticlesPage: React.FC = () => {
   const particlesRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, signInWithGoogle } = useAuth();
+  const [isConnecting, setIsConnecting] = useState(false);
 
   const handleConnect = async () => {
     if (user) {
       router.push('/choose');
-    } else {
-      await signInWithGoogle();
-      router.push('/choose');
+      return;
+    }
+
+    if (isConnecting) return;
+
+    setIsConnecting(true);
+    try {
+      const signedIn = await signInWithGoogle();
+      if (signedIn) {
+        router.push('/choose');
+      }
+    } finally {
+      setIsConnecting(false);
     }
   };
+
+  React.useEffect(() => {
+    if (!user) return;
+
+    const redirect = sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY);
+    if (redirect) {
+      sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
+      router.push(redirect);
+    }
+  }, [user, router]);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -485,7 +506,7 @@ const ParticlesPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isLoading && particlesRef.current) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');

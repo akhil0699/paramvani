@@ -57,9 +57,19 @@ export const LORD_SYSTEM_PROMPTS: Record<LordId, string> = {
 };
 
 export function getLordSystemPrompt(lordId: string): string {
-  if (lordId === 'hanuman') return HANUMAN_SYSTEM_PROMPT;
-  return VISHNU_SYSTEM_PROMPT;
+  const base = lordId === 'hanuman' ? HANUMAN_SYSTEM_PROMPT : VISHNU_SYSTEM_PROMPT;
+  return base + RESPONSE_LENGTH_RULE;
 }
 
 /** Default OpenRouter model — override via OPENROUTER_MODEL env */
 export const OPENROUTER_DEFAULT_MODEL = 'openai/gpt-4.1-mini';
+
+/** ~30 seconds of Hindi TTS at conversational pace */
+export const MAX_SPEECH_WORDS = 70;
+
+export const RESPONSE_LENGTH_RULE = `
+
+उत्तर की लंबाई (Length Limit):
+तुम्हारा उत्तर अधिकतम 30 सेकंड में बोला जा सके — लगभग ${MAX_SPEECH_WORDS} शब्द।
+पूरा और संपूर्ण उत्तर दो, लेकिन संक्षिप्त रखो — बीच में काटा हुआ या अधूरा उत्तर न दो।
+लंबे उत्तर न दो; प्रभावशाली और हृदय को छूने वाला पूरा उत्तर दो।`;

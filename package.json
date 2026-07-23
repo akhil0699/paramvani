@@ -33,6 +33,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.9.1",
+    "replicate": "^1.4.0",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1",
@@ -46,7 +47,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy:firestore-rules": "node scripts/deploy-firestore-rules.mjs"
   },
   "eslintConfig": {
     "extends": [

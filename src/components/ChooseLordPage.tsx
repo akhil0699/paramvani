@@ -4,6 +4,7 @@ import styled, { keyframes } from 'styled-components';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { LORD_LIST } from '@/lib/lords';
+import { preloadLordVideo } from '@/lib/preloadVideo';
 
 const fadeIn = keyframes`
   from {
@@ -250,6 +251,13 @@ const ChooseLordPage: React.FC = () => {
   const particlesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    LORD_LIST.forEach((lord) => {
+      router.prefetch(`/talk/${lord.id}`);
+      preloadLordVideo(lord.video);
+    });
+  }, [router]);
+
+  useEffect(() => {
     if (!particlesRef.current) return;
 
     const canvas = document.createElement('canvas');
@@ -336,6 +344,8 @@ const ChooseLordPage: React.FC = () => {
               key={lord.id}
               type="button"
               $delay={120 + index * 120}
+              onMouseEnter={() => preloadLordVideo(lord.video)}
+              onFocus={() => preloadLordVideo(lord.video)}
               onClick={() => router.push(`/talk/${lord.id}`)}
             >
               <CardFrame>

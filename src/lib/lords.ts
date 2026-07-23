@@ -19,6 +19,12 @@ export interface VideoClipConfig {
   objectPosition: string;
   /** Lipsync lerp speed per frame (0–1). Higher = snappier mouth. Default 0.85. */
   lipsyncSpeed: number;
+  /** Min video playback rate when speech is quiet (default 0.24). */
+  mouthRateMin?: number;
+  /** Max video playback rate when speech is loud (default 0.82). */
+  mouthRateMax?: number;
+  /** Audio energy smoothing (0–1). Higher = snappier response. Default 0.38. */
+  mouthEnergySmoothing?: number;
   /**
    * Mouth overlay position on the video element (all values in %).
    * x/y = top-left corner of the ellipse as % of video container width/height.
@@ -35,7 +41,13 @@ export interface LordConfig {
   nameEn: string;
   tagline: string;
   video: string;
+  /** High-res image shown in the UI (idle / loading state). */
   image: string;
+  /**
+   * Smaller image sent to D-ID for lipsync generation.
+   * D-ID processes faster with a compact image (~800-1200px, <1 MB).
+   */
+  didImage: string;
   brandLabel: string;
   mobileObjectPosition: string;
   videoClip: VideoClipConfig;
@@ -48,7 +60,8 @@ export const LORDS: Record<LordId, LordConfig> = {
     nameEn: 'Lord Vishnu',
     tagline: 'शांति, धर्म और दिव्य मार्गदर्शन',
     video: '/ai-video.mp4',
-    image: '/images/lord-vishnu.jpg',
+    image: '/images/lord-vishnu-4k.jpg',
+    didImage: '/images/lord-vishnu-4k.jpg',
     brandLabel: 'देव वाणी',
     mobileObjectPosition: '49% 22%',
     videoClip: {
@@ -58,6 +71,9 @@ export const LORDS: Record<LordId, LordConfig> = {
       mouthScrubEnd: 3.2,
       objectPosition: '47% 22%',
       lipsyncSpeed: 0.88,
+      mouthRateMin: 0.55,
+      mouthRateMax: 0.88,
+      mouthEnergySmoothing: 0.4,
       // Tune x/y so the ellipse sits over Vishnu's lips
       mouth: { x: 41, y: 33, w: 18, h: 7 },
     },
@@ -68,7 +84,8 @@ export const LORDS: Record<LordId, LordConfig> = {
     nameEn: 'Lord Hanuman',
     tagline: 'शक्ति, भक्ति और साहस',
     video: '/hanuman.mp4',
-    image: '/images/lord-hanuman.jpg',
+    image: '/images/lord-hanuman-4k.jpg',
+    didImage: '/images/lord-hanuman-4k.jpg',
     brandLabel: 'हनुमान वाणी',
     mobileObjectPosition: '50% 100%', // Focus on the bottom of the video where hands are
     videoClip: {
@@ -78,6 +95,9 @@ export const LORDS: Record<LordId, LordConfig> = {
       mouthScrubEnd: 3.2,
       objectPosition: '50% 18%',
       lipsyncSpeed: 0.95,
+      mouthRateMin: 0.55,
+      mouthRateMax: 0.9,
+      mouthEnergySmoothing: 0.42,
       // Tune x/y so the ellipse sits over Hanuman's lips
       mouth: { x: 40, y: 32, w: 20, h: 8 },
     },

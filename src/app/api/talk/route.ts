@@ -3,12 +3,13 @@ import { isLordId } from '@/lib/lords';
 import { cleanAiOutput } from '@/lib/server/cleanText';
 import { appendToSession, getSessionHistory } from '@/lib/server/sessionStore';
 import { chatWithLord } from '@/lib/server/openrouter';
-import { generateSpeechDataUrl } from '@/lib/server/murf';
+import { generateSpeech } from '@/lib/server/murf';
 import { transcribeAudio } from '@/lib/server/transcribe';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import * as admin from 'firebase-admin';
 
 export const runtime = 'nodejs';
+export const maxDuration = 30; // fast — we no longer wait for D-ID to finish
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,71 +41,67 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No input provided' }, { status: 400 });
     }
 
-    // Verify Firebase Authentication
+    // ── Auth ────────────────────────────────────────────────────────────────
     const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized: Missing or invalid token' }, { status: 401 });
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const token = authHeader.split('Bearer ')[1];
     let decodedToken;
     try {
-      decodedToken = await adminAuth.verifyIdToken(token);
-    } catch (err) {
-      console.error("Token verification failed:", err);
+      decodedToken = await adminAuth.verifyIdToken(authHeader.split('Bearer ')[1]);
+    } catch {
       return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
     }
 
     const uid = decodedToken.uid;
     const userRef = adminDb.collection('users').doc(uid);
     const userDoc = await userRef.get();
-
     if (!userDoc.exists) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
-    const userData = userDoc.data() as any;
-    
-    // Check Subscription and Credits
+    const userData = userDoc.data() as Record<string, unknown>;
     const now = Date.now();
-    const isSubscribed = userData.subscriptionType !== 'free' && 
-                         userData.subscriptionExpiry && 
-                         userData.subscriptionExpiry > now;
+    const isSubscribed =
+      userData.subscriptionType !== 'free' &&
+      typeof userData.subscriptionExpiry === 'number' &&
+      userData.subscriptionExpiry > now;
 
     if (!isSubscribed) {
-      // Lazy cleanup: If their expiry has passed but the DB still says they are subscribed, flip them to free
       if (userData.subscriptionType !== 'free') {
-        await userRef.update({
-          subscriptionType: 'free'
-        });
+        await userRef.update({ subscriptionType: 'free' });
       }
-
-      if (userData.freeCredits > 0) {
-        // Deduct 1 free credit
-        await userRef.update({
-          freeCredits: admin.firestore.FieldValue.increment(-1)
-        });
-      } else {
-        // Out of credits and not subscribed
+      if ((userData.freeCredits as number) <= 0) {
         return NextResponse.json(
-          { error: 'Payment required. Out of free credits.' }, 
-          { status: 402 } // 402 Payment Required
+          { error: 'Payment required. Out of free credits.' },
+          { status: 402 }
         );
       }
     }
 
-    // Process AI Request
+    // ── AI text + TTS audio (sequential, both needed before returning) ───────
     const history = getSessionHistory(sessionId);
     const rawReply = await chatWithLord(lordIdRaw, message, history);
     const cleaned = cleanAiOutput(rawReply);
-
     appendToSession(sessionId, message, cleaned);
 
-    const audioFile = await generateSpeechDataUrl(cleaned, lordIdRaw);
+    // Murf TTS: get CDN URL, download buffer, return as base64 data URI
+    const murCdnUrl   = await generateSpeech(cleaned, lordIdRaw);
+    const audioRes    = await fetch(murCdnUrl);
+    const audioBuffer = Buffer.from(await audioRes.arrayBuffer());
+    const audioMime   = audioRes.headers.get('content-type') || 'audio/mpeg';
+    const audioFile   = `data:${audioMime};base64,${audioBuffer.toString('base64')}`;
+
+    // ── Deduct credit ────────────────────────────────────────────────────────
+    if (!isSubscribed) {
+      await userRef.update({
+        freeCredits: admin.firestore.FieldValue.increment(-1),
+      });
+    }
 
     return NextResponse.json({
-      audioFile,
-      response: cleaned,
+      audioFile,          // play immediately with captions
       transcript: cleaned,
       lordId: lordIdRaw,
     });

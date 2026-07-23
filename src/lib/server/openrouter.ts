@@ -1,4 +1,4 @@
-import { getLordSystemPrompt, OPENROUTER_DEFAULT_MODEL } from '@/lib/prompts';
+import { getLordSystemPrompt, MAX_SPEECH_WORDS, OPENROUTER_DEFAULT_MODEL } from '@/lib/prompts';
 import type { ChatMessage } from './sessionStore';
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -30,7 +30,11 @@ export async function chatWithLord(
       'HTTP-Referer': process.env.APP_URL || 'http://localhost:3000',
       'X-Title': 'Paramvani Dev Vani',
     },
-    body: JSON.stringify({ model, messages }),
+    body: JSON.stringify({
+      model,
+      messages,
+      max_tokens: MAX_SPEECH_WORDS * 3,
+    }),
   });
 
   if (!response.ok) {

@@ -9,11 +9,13 @@ if (!admin.apps.length) {
         // Handle escaped newlines in the private key
         privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
       }),
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     });
   } catch (error) {
     console.error('Firebase admin initialization error', error);
   }
 }
 
-export const adminDb = admin.firestore();
-export const adminAuth = admin.auth();
+export const adminDb      = admin.firestore();
+export const adminAuth    = admin.auth();
+export const adminStorage = admin.storage();
