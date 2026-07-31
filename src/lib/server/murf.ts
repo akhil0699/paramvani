@@ -10,7 +10,7 @@ export async function generateSpeech(
     throw new Error('MURF_API_KEY is not configured');
   }
 
-  let voiceId = process.env.MURF_VOICE_ID || 'hi-IN-shaan';
+  let voiceId = process.env.MURF_VOICE_ID || 'en-US-carter';
   if (lordId === 'vishnu' && process.env.MURF_VOICE_ID_VISHNU) {
     voiceId = process.env.MURF_VOICE_ID_VISHNU;
   } else if (lordId === 'hanuman' && process.env.MURF_VOICE_ID_HANUMAN) {
