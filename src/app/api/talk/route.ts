@@ -4,6 +4,7 @@ import { cleanAiOutput } from '@/lib/server/cleanText';
 import { appendToSession, getSessionHistory } from '@/lib/server/sessionStore';
 import { chatWithLord } from '@/lib/server/openrouter';
 import { generateSpeech } from '@/lib/server/murf';
+import { detectMurfStyle } from '@/lib/server/murfStyle';
 import { transcribeAudio } from '@/lib/server/transcribe';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import * as admin from 'firebase-admin';
@@ -86,8 +87,10 @@ export async function POST(request: NextRequest) {
     const cleaned = cleanAiOutput(rawReply);
     appendToSession(sessionId, message, cleaned);
 
-    // Murf TTS: get CDN URL, download buffer, return as base64 data URI
-    const murCdnUrl   = await generateSpeech(cleaned, lordIdRaw);
+    const murfStyle = detectMurfStyle(message);
+
+    // Murf TTS: pick style from question tone (Calm / Conversational / Promo / Sad)
+    const murCdnUrl   = await generateSpeech(cleaned, lordIdRaw, murfStyle);
     const audioRes    = await fetch(murCdnUrl);
     const audioBuffer = Buffer.from(await audioRes.arrayBuffer());
     const audioMime   = audioRes.headers.get('content-type') || 'audio/mpeg';

@@ -449,6 +449,9 @@ const LipsyncBadge = styled.div<{ $visible: boolean }>`
 `;
 
 const CAPTION_WINDOW = 8;
+/** Soft background while the lord speaks — keep speech clearly audible. */
+const SPEAKING_BGM_SRC = "/mahabharat-theme.mp3";
+const SPEAKING_BGM_VOLUME = 0.22;
 
 function getVisibleWords(
   words: Array<{ word: string }>,
@@ -505,6 +508,7 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
   /** Video element — plays lord.video with audio-energy-driven lipsync. */
   const speakingVideoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const bgmRef = useRef<HTMLAudioElement>(null);
   /** Web Audio API — created once per component life, routes audio to speaker + analyser. */
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -595,6 +599,10 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
       if (audioBlobUrlRef.current) {
         URL.revokeObjectURL(audioBlobUrlRef.current);
         audioBlobUrlRef.current = null;
+      }
+      if (bgmRef.current) {
+        bgmRef.current.pause();
+        bgmRef.current.currentTime = 0;
       }
     };
   }, []);
@@ -701,9 +709,30 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
     }
   };
 
+  const stopBackgroundMusic = () => {
+    const bgm = bgmRef.current;
+    if (!bgm) return;
+    bgm.pause();
+    bgm.currentTime = 0;
+  };
+
+  const startBackgroundMusic = async () => {
+    const bgm = bgmRef.current;
+    if (!bgm) return;
+    bgm.volume = SPEAKING_BGM_VOLUME;
+    bgm.loop = true;
+    bgm.currentTime = 0;
+    try {
+      await bgm.play();
+    } catch {
+      // Autoplay may be blocked until user gesture — speech still works.
+    }
+  };
+
   // ── Stop playback ─────────────────────────────────────────────────────────
   const stopPlayback = () => {
     stopLipSync();
+    stopBackgroundMusic();
     setIsAudioPlaying(false);
     setIsSpeakingVideoVisible(false);
     stopCaptionSync();
@@ -731,6 +760,7 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
         cancelAnimationFrame(lipSyncFrameRef.current);
         lipSyncFrameRef.current = null;
       }
+      stopBackgroundMusic();
       stopCaptionSync();
       setIsAudioPlaying(false);
       setIsSpeakingVideoVisible(false);
@@ -919,6 +949,7 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
         setIsAudioPlaying(true);
         // Start animated lord video loop in sync with audio (free — no API)
         await startSpeakingVideo();
+        await startBackgroundMusic();
         await audio.play();
         startCaptionSync(() => audio.currentTime);
       }
@@ -1053,8 +1084,10 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
         </LoadingOverlay>
       </MediaContainer>
 
-      {/* Audio element — src set imperatively only, never via React prop */}
+      {/* Lord speech — src set imperatively only, never via React prop */}
       <HiddenAudio ref={audioRef} preload="none" />
+      {/* Soft Mahabharat theme while the lord speaks */}
+      <HiddenAudio ref={bgmRef} src={SPEAKING_BGM_SRC} preload="auto" />
 
       {showSubscriptionModal && (
         <SubscriptionModal onClose={() => setShowSubscriptionModal(false)} />
