@@ -255,6 +255,27 @@ const GeneratedVideo = styled.video.withConfig({
   backface-visibility: hidden;
 `;
 
+// ── One-time arrival intro ─────────────────────────────────────────────────
+// Plays Start_<Lord>.mp4 once when the page first loads, using the exact
+// same sizing/positioning as the idle image + speaking video so the lord
+// appears standing/sitting in the same on-screen spot when the intro ends
+// and the main 4K presence takes over — no visual "jump".
+
+const IntroOverlay = styled.div<{ $visible: boolean }>`
+  position: absolute; inset: 0;
+  z-index: 6;
+  background: var(--page-bg, #0a1a0a);
+  opacity: ${(p) => (p.$visible ? 1 : 0)};
+  pointer-events: none;
+  transition: opacity .6s ease;
+`;
+
+const IntroVideo = styled.video.withConfig({
+  shouldForwardProp: (p) => !["$objectPosition"].includes(p),
+})<{ $objectPosition: string }>`
+  ${mediaBase}
+`;
+
 // ── Loading overlay ────────────────────────────────────────────────────────
 
 const breathe = keyframes`
@@ -497,6 +518,10 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
   /** True while the lord speaking video is looping over the audio. */
   const [isSpeakingVideoVisible, setIsSpeakingVideoVisible] = useState(false);
 
+  // ── Arrival intro (plays every time the talk page is opened) ──────────────
+  const [introState, setIntroState] = useState<"playing" | "done">("playing");
+  const introVideoRef = useRef<HTMLVideoElement>(null);
+
   // ── Captions ──────────────────────────────────────────────────────────────
   const [wordDurations, setWordDurations] = useState<Array<{ word: string; startMs: number; endMs: number }>>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -606,6 +631,50 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
       }
     };
   }, []);
+
+  // ── Arrival intro playback (plays in full every time the talk page opens) ─
+  const finishIntro = () => {
+    const vid = introVideoRef.current;
+    if (vid) {
+      vid.pause();
+      vid.removeAttribute("src");
+      vid.load();
+    }
+    setIntroState("done");
+  };
+
+  useEffect(() => {
+    setIntroState("playing");
+    const vid = introVideoRef.current;
+    if (!vid) return;
+
+    vid.src = lord.introVideo;
+    vid.currentTime = 0;
+    vid.volume = 1;
+    vid.muted = false;
+    vid.load();
+
+    const onEnded = () => finishIntro();
+    const onError = () => finishIntro();
+    vid.addEventListener("ended", onEnded);
+    vid.addEventListener("error", onError);
+
+    // primeAutoplayAudio() (fired on the lord-card click in /choose) already
+    // established the user gesture this unmuted play() relies on — Next.js
+    // client-side navigation keeps the same document, so that permission
+    // carries over here. Muted is only a last-resort fallback for a direct
+    // page load/refresh with no prior interaction at all.
+    vid.play().catch(() => {
+      vid.muted = true;
+      vid.play().catch(() => {});
+    });
+
+    return () => {
+      vid.removeEventListener("ended", onEnded);
+      vid.removeEventListener("error", onError);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lord.id]);
 
   // ── Particles ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -1082,6 +1151,17 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
           <LoadingRing />
           <LoadingText>Receiving divine wisdom…</LoadingText>
         </LoadingOverlay>
+
+        {/* Cinematic arrival — plays in full, same sizing as idle image/video
+            so the lord lands in the exact same on-screen position when this
+            ends and the main 4K presence takes over. */}
+        <IntroOverlay $visible={introState !== "done"}>
+          <IntroVideo
+            ref={introVideoRef}
+            $objectPosition={objPosition}
+            playsInline
+          />
+        </IntroOverlay>
       </MediaContainer>
 
       {/* Lord speech — src set imperatively only, never via React prop */}
@@ -1116,12 +1196,13 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
           <ThinkingDots><span /><span /><span /></ThinkingDots>
         </ThinkingBar>
 
-        <ModernInput $disabled={isGeneratingAudio || isAudioPlaying}>
+        <ModernInput $disabled={isGeneratingAudio || isAudioPlaying || introState !== "done"}>
           <TextInput
             ref={inputRef}
             type="text"
             placeholder={
-              isGeneratingAudio ? "Preparing divine vision…"
+              introState !== "done" ? "The divine presence is arriving…"
+              : isGeneratingAudio ? "Preparing divine vision…"
               : isListening ? "Listening…"
               : isAudioPlaying ? "Speaking…"
               : "Share your heart…"
@@ -1129,14 +1210,14 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyPress={handleKeyPress}
-            disabled={isGeneratingAudio || isAudioPlaying}
+            disabled={isGeneratingAudio || isAudioPlaying || introState !== "done"}
           />
 
           {inputText.trim() ? (
             <SubmitButton
               onClick={handleTextSubmit}
               type="button"
-              disabled={isGeneratingAudio || isAudioPlaying}
+              disabled={isGeneratingAudio || isAudioPlaying || introState !== "done"}
             >
               {isGeneratingAudio ? <Spinner $color="#0a1a0a" /> : <Send />}
             </SubmitButton>
@@ -1145,7 +1226,7 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
               $isListening={isListening || isGeneratingAudio}
               onClick={handleSpeak}
               type="button"
-              disabled={isGeneratingAudio || isAudioPlaying}
+              disabled={isGeneratingAudio || isAudioPlaying || introState !== "done"}
             >
               {isGeneratingAudio ? <Spinner $color="#8dc63f" />
                : isListening ? <MicOff />

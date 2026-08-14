@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { LORD_LIST } from '@/lib/lords';
 import { preloadLordVideo } from '@/lib/preloadVideo';
+import { primeAutoplayAudio } from '@/lib/primeAutoplay';
 
 const fadeIn = keyframes`
   from {
@@ -346,7 +347,14 @@ const ChooseLordPage: React.FC = () => {
               $delay={120 + index * 120}
               onMouseEnter={() => preloadLordVideo(lord.video)}
               onFocus={() => preloadLordVideo(lord.video)}
-              onClick={() => router.push(`/talk/${lord.id}`)}
+              onClick={() => {
+                // Runs inside the click's user-gesture context, so the
+                // browser allows unmuted playback — this permission then
+                // carries over to the talk page's intro video since Next.js
+                // navigates client-side (same document, no reload).
+                primeAutoplayAudio();
+                router.push(`/talk/${lord.id}`);
+              }}
             >
               <CardFrame>
                 <CardImage>

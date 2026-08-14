@@ -41,6 +41,8 @@ export interface LordConfig {
   nameEn: string;
   tagline: string;
   video: string;
+  /** One-time cinematic intro played when the talk page first loads. */
+  introVideo: string;
   /** High-res image shown in the UI (idle / loading state). */
   image: string;
   /**
@@ -60,6 +62,7 @@ export const LORDS: Record<LordId, LordConfig> = {
     nameEn: 'Lord Vishnu',
     tagline: 'शांति, धर्म और दिव्य मार्गदर्शन',
     video: '/ai-video.mp4',
+    introVideo: '/Start_Vishnu.mp4',
     image: '/images/lord-vishnu-4k.jpg',
     didImage: '/images/lord-vishnu-4k.jpg',
     brandLabel: 'देव वाणी',
@@ -84,6 +87,7 @@ export const LORDS: Record<LordId, LordConfig> = {
     nameEn: 'Lord Hanuman',
     tagline: 'शक्ति, भक्ति और साहस',
     video: '/hanuman.mp4',
+    introVideo: '/Start_Hanuman.mp4',
     image: '/images/lord-hanuman-4k.jpg',
     didImage: '/images/lord-hanuman-4k.jpg',
     brandLabel: 'हनुमान वाणी',
