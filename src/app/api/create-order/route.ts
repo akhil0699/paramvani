@@ -6,10 +6,15 @@ import * as admin from 'firebase-admin';
 export const runtime = 'nodejs';
 
 // ── Razorpay client (server-side only) ────────────────────────────────────────
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+function getRazorpay() {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    throw new Error('RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is not set');
+  }
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  });
+}
 
 // ── SECURITY: whitelist the only amounts we accept ────────────────────────────
 // This prevents a malicious client from crafting a ₹1 order for a monthly plan.
@@ -66,6 +71,7 @@ export async function POST(request: NextRequest) {
     // ── 4. Create Razorpay order ──────────────────────────────────────────────
     const receipt = `pv_${plan}_${uid.slice(0, 8)}_${Date.now()}`;
 
+    const razorpay = getRazorpay();
     const order = await razorpay.orders.create({ amount, currency, receipt });
 
     // ── 5. Log PENDING payment record in Firestore for audit ─────────────────
