@@ -6,6 +6,8 @@ import { ArrowLeft } from 'lucide-react';
 import { LORD_LIST } from '@/lib/lords';
 import { preloadLordVideo } from '@/lib/preloadVideo';
 import { primeAutoplayAudio } from '@/lib/primeAutoplay';
+import { useLang } from '@/context/LanguageContext';
+import { translations as T, t } from '@/lib/translations';
 
 const fadeIn = keyframes`
   from {
@@ -250,6 +252,7 @@ const ConnectHint = styled.span`
 const ChooseLordPage: React.FC = () => {
   const router = useRouter();
   const particlesRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLang();
 
   useEffect(() => {
     LORD_LIST.forEach((lord) => {
@@ -327,15 +330,15 @@ const ChooseLordPage: React.FC = () => {
         <TopBar>
           <BackButton type="button" onClick={() => router.push('/')}>
             <ArrowLeft />
-            Back
+            {t(T.choose.back, lang)}
           </BackButton>
         </TopBar>
 
         <Header>
-          <Eyebrow>Dev Vani</Eyebrow>
-          <Title>अपने प्रभु को चुनें</Title>
+          <Eyebrow>{t(T.home.eyebrow, lang)}</Eyebrow>
+          <Title>{t(T.choose.heading, lang)}</Title>
           <Subtitle>
-            Choose the divine presence you wish to connect with. Your conversation will begin in their sacred space.
+            {t(T.choose.subheading, lang)}
           </Subtitle>
         </Header>
 
@@ -364,7 +367,7 @@ const ChooseLordPage: React.FC = () => {
                     <LordName>{lord.name}</LordName>
                     <LordNameEn>{lord.nameEn}</LordNameEn>
                     <LordTagline>{lord.tagline}</LordTagline>
-                    <ConnectHint>Connect →</ConnectHint>
+                    <ConnectHint>{t(T.choose.connectHint, lang)}</ConnectHint>
                   </CardContent>
                 </CardImage>
               </CardFrame>

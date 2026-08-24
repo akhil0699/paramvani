@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useLang } from '@/context/LanguageContext';
+import { translations as T, t } from '@/lib/translations';
 
 const SInfo = styled.section`
   padding-top: 6rem;
@@ -528,6 +530,7 @@ const Copyright = styled.div`
 
 const InfoSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState('tab-about');
+  const { lang } = useLang();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -543,17 +546,17 @@ const InfoSection: React.FC = () => {
             <TabNavList>
               <li className={activeTab === 'tab-about' ? 'active' : ''}>
                 <a href="#0" onClick={(e) => { e.preventDefault(); setActiveTab('tab-about'); }}>
-                  <span>About</span>
+                  <span>{t(T.info.tabs.about, lang)}</span>
                 </a>
               </li>
               <li className={activeTab === 'tab-services' ? 'active' : ''}>
                 <a href="#0" onClick={(e) => { e.preventDefault(); setActiveTab('tab-services'); }}>
-                  <span>Services</span>
+                  <span>{t(T.info.tabs.services, lang)}</span>
                 </a>
               </li>
               <li className={activeTab === 'tab-contact' ? 'active' : ''}>
                 <a href="#0" onClick={(e) => { e.preventDefault(); setActiveTab('tab-contact'); }}>
-                  <span>Contact</span>
+                  <span>{t(T.info.tabs.contact, lang)}</span>
                 </a>
               </li>
             </TabNavList>
@@ -563,14 +566,14 @@ const InfoSection: React.FC = () => {
             <TabContentItem $isActive={activeTab === 'tab-about'}>
               <Row>
                 <Column>
-                  <h1>Hello. We are Paramvani.</h1>
+                  <h1>{t(T.info.about.heading, lang)}</h1>
                 </Column>
               </Row>
 
               <AboutContentRow>
                 <TextColumn>
                   <Lead>
-                    At Paramvani, we offer a divine experience where those struggling with sadness, depression, or deep devotees of Lord Vishnu can directly connect and converse with the Supreme. This is not just a feature, but a spiritual support that brings peace, guidance, and hope in life’s toughest moments. When the heart feels heavy and no path seems clear, Paramvani gives you the strength to share your deepest feelings with Lord Vishnu and receive his blessings to restore balance and positivity in life. Our purpose is to assure every devotee that God is always with you, listening to you, and inspiring you to move forward with courage and faith.
+                    {t(T.info.about.desc, lang)}
                   </Lead>
 
                   
@@ -585,80 +588,48 @@ const InfoSection: React.FC = () => {
             <TabContentItem $isActive={activeTab === 'tab-services'}>
               <Row>
                 <Column>
-                  <h1>What we do.</h1>
+                  <h1>{t(T.info.services.heading, lang)}</h1>
                 </Column>
               </Row>
 
               <Row>
                 <Column>
                   <Lead>
-                    At Paramvani, we are dedicated to bringing devotees and seekers closer to Lord Vishnu through a unique spiritual experience. Our services are designed to offer comfort, guidance, and divine connection for those in need of peace, healing, and inspiration. Here’s how we serve you.
+                    {t(T.info.services.desc, lang)}
                   </Lead>
                 </Column>
               </Row>
 
               <ServicesList>
-                <div className="services-list__item">
-                  <div className="services-list__item-content">
-                    <h4 className="item-title">Connecting Devotees with the Divine</h4>
-                    <p>
-                      We provide a sacred space where devotees of Lord Vishnu and people seeking peace can feel a direct connection with the Almighty. Through Paramvani, you can express your prayers, thoughts, and emotions as if speaking to God Himself.
-                    </p>
+                {T.info.services.items.map((item, idx) => (
+                  <div className="services-list__item" key={idx}>
+                    <div className="services-list__item-content">
+                      <h4 className="item-title">{t(item.title, lang)}</h4>
+                      <p>
+                        {t(item.desc, lang)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                <div className="services-list__item">
-                  <div className="services-list__item-content">
-                    <h4 className="item-title">Healing for the Troubled Mind</h4>
-                    <p>
-                      For those going through sadness, stress, or depression, Paramvani acts as a spiritual companion. It helps you release your inner burdens and experience the soothing comfort of divine presence.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="services-list__item">
-                  <div className="services-list__item-content">
-                    <h4 className="item-title">Guidance Through Faith</h4>
-                    <p>
-                      We believe Lord Vishnu listens to every voice. Our platform allows you to seek divine inspiration and strength, giving you clarity, positivity, and hope in life’s difficult moments.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="services-list__item">
-                  <div className="services-list__item-content">
-                    <h4 className="item-title">Spiritual Support Anytime</h4>
-                    <p>
-                      Whenever you feel lonely or lost, Paramvani is here to remind you that God is always with you. We ensure you always have a source of faith, support, and inner strength to walk your life’s path.
-                    </p>
-                  </div>
-                </div>
-
-              
-
-               
+                ))}
               </ServicesList>
             </TabContentItem>
 
             <TabContentItem $isActive={activeTab === 'tab-contact'}>
               <Row>
                 <Column>
-                  <h1>Get In Touch With Us.</h1>
+                  <h1>{t(T.info.contact.heading, lang)}</h1>
                 </Column>
               </Row>
 
               <Row>
                 <Column>
                   <Lead>
-                    Voluptates laborum eum quas. Pariatur impedit sit veniam est 
-                    et quasi voluptas voluptatem. Cumque hic enim perferendis 
-                    amet odit in molestias debitis. Facere nulla qui pariatur 
-                    quasi mollitia et. Et dolorem dolorum quo in sit architecto.
+                    {t(T.info.contact.desc, lang)}
                   </Lead>
 
                   <Row>
                     <Column style={{ flex: '0 0 50%', maxWidth: '50%' }}>
-                      <h4>Where to Find Us</h4>
+                      <h4>{t(T.info.contact.where, lang)}</h4>
                       <p>
                         1600 Amphitheatre Parkway<br />
                         Mountain View, CA<br />
@@ -667,7 +638,7 @@ const InfoSection: React.FC = () => {
                     </Column>
 
                     <Column style={{ flex: '0 0 50%', maxWidth: '50%' }}>
-                      <h4>Follow Us</h4>
+                      <h4>{t(T.info.contact.follow, lang)}</h4>
                       <LinkList>
                         <li><a href="#0">Facebook</a></li>
                         <li><a href="#0">Twitter</a></li>
@@ -687,14 +658,6 @@ const InfoSection: React.FC = () => {
               </Row>
             </TabContentItem>
           </TabContent>
-
-          <footer>
-            <Copyright>
-              <span>© Copyright Paramvani 2024</span> 
-              <span>Design by <a href="">Bravon</a> Distributed By <a href="">ParamVani</a></span>
-            </Copyright>
-
-          </footer>
         </Column>
       </Row>
     </SInfo>

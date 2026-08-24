@@ -62,3 +62,32 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* ─── Global Hindi Typography Overrides ──────────────────────────────────────── */
+html[lang="hi"] body,
+html[lang="hi"] h1,
+html[lang="hi"] h2,
+html[lang="hi"] h3,
+html[lang="hi"] h4,
+html[lang="hi"] h5,
+html[lang="hi"] h6,
+html[lang="hi"] p,
+html[lang="hi"] span,
+html[lang="hi"] a,
+html[lang="hi"] button,
+html[lang="hi"] div,
+html[lang="hi"] li {
+  font-family: "Noto Sans Devanagari", "Gothic A1", sans-serif;
+  letter-spacing: 0.01em !important;
+  text-transform: none !important;
+}
+
+/* Preserve FontAwesome icons when in Hindi */
+html[lang="hi"] i.fa-solid,
+html[lang="hi"] i.fa-regular,
+html[lang="hi"] i.fa-brands,
+html[lang="hi"] i[class*="fa-"],
+html[lang="hi"] svg {
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", inherit !important;
+  letter-spacing: normal !important;
+}

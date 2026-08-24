@@ -248,8 +248,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signInWithGoogle = async (): Promise<boolean> => {
     if (signInInFlightRef.current) {
-      // A sign-in attempt is already running (e.g. double-click) — ignore
-      // this call instead of racing a second popup/redirect against it.
+      // A sign-in attempt is already running — ignore to prevent double-calls
       return false;
     }
 
@@ -262,9 +261,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return !!result.user;
     } catch (error) {
       if (error instanceof FirebaseError) {
-        // These just mean the popup was dismissed/superseded, not that
-        // popups are actually blocked — never fall back to redirect here,
-        // or you get both a popup AND a full-page redirect at once.
+        // Popup dismissed by user — not an error
         if (
           error.code === "auth/popup-closed-by-user" ||
           error.code === "auth/cancelled-popup-request"
@@ -272,6 +269,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return false;
         }
 
+        // Popup blocked by browser — fall back to redirect
         if (error.code === "auth/popup-blocked") {
           if (typeof window !== "undefined") {
             sessionStorage.setItem(POST_LOGIN_REDIRECT_KEY, "/choose");

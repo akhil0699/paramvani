@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Header from './Header';
 import Preloader from './Preloader';
 import Modal from './Modal';
 import SocialLinks from './SocialLinks';
@@ -388,7 +387,6 @@ const SlidesPage: React.FC = () => {
       <Preloader isLoading={isLoading} />
       
       <SIntro id="intro">
-        <Header />
         
         <IntroSlider>
           {slides.map((slide, index) => (

@@ -2,13 +2,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
-import Header from './Header';
 import Preloader from './Preloader';
 import Modal from './Modal';
 import SocialLinks from './SocialLinks';
 import ScrollLinkComponent from './ScrollLink';
 import InfoSection from './InfoSection';
 import { useAuth, POST_LOGIN_REDIRECT_KEY } from '@/context/AuthContext';
+import { useLang } from '@/context/LanguageContext';
+import { translations as T, t } from '@/lib/translations';
 
 const SIntro = styled.section`
   width: 100%;
@@ -249,15 +250,15 @@ const Column = styled.div`
   }
 `;
 
-const IntroText = styled.div`
+const IntroText = styled.div<{ $lang?: string }>`
   h3 {
     display: inline-block;
-    font-family: "Gothic A1", sans-serif;
-    font-weight: 400;
-    font-size: 1.2rem;
+    font-family: ${(p) => p.$lang === 'hi' ? '"Noto Sans Devanagari", "Gothic A1", sans-serif' : '"Gothic A1", sans-serif'};
+    font-weight: ${(p) => p.$lang === 'hi' ? '500' : '400'};
+    font-size: ${(p) => p.$lang === 'hi' ? '1.4rem' : '1.2rem'};
     line-height: 1.8rem;
-    text-transform: uppercase;
-    letter-spacing: .3em;
+    text-transform: ${(p) => p.$lang === 'hi' ? 'none' : 'uppercase'};
+    letter-spacing: ${(p) => p.$lang === 'hi' ? '0.02em' : '.3em'};
     color: #8dc63f;
     padding-left: .6rem;
     margin-top: 0;
@@ -288,11 +289,11 @@ const IntroText = styled.div`
     }
 
     @media screen and (max-width: 600px) {
-      font-size: 1rem;
+      font-size: ${(p) => p.$lang === 'hi' ? '1.15rem' : '1rem'};
     }
 
     @media screen and (max-width: 400px) {
-      font-size: 0.9rem;
+      font-size: ${(p) => p.$lang === 'hi' ? '1.05rem' : '0.9rem'};
     }
   }
 
@@ -385,7 +386,7 @@ const IntroBottom = styled.div`
   }
 `;
 
-const NotifyButton = styled.button`
+const NotifyButton = styled.button<{ $lang?: string }>`
   z-index: 2;
   font-size: 1rem;
   margin: 0;
@@ -398,10 +399,11 @@ const NotifyButton = styled.button`
   position: relative;
   background: transparent;
   padding: 0 2rem;
-  font-family: "Gothic A1", sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .6rem;
+  font-family: ${(p) => p.$lang === 'hi' ? '"Noto Sans Devanagari", "Gothic A1", sans-serif' : '"Gothic A1", sans-serif'};
+  font-weight: ${(p) => p.$lang === 'hi' ? '500' : '700'};
+  text-transform: ${(p) => p.$lang === 'hi' ? 'none' : 'uppercase'};
+  letter-spacing: ${(p) => p.$lang === 'hi' ? '0.02em' : '.6rem'};
+  font-size: ${(p) => p.$lang === 'hi' ? '1.3rem' : '1rem'};
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 
   svg {
@@ -439,7 +441,7 @@ const NotifyButton = styled.button`
     margin-top: 2.5rem;
     height: 5rem !important;
     line-height: 4.8rem !important;
-    font-size: 0.9rem;
+    font-size: ${(p) => p.$lang === 'hi' ? '1.15rem' : '0.9rem'};
     padding: 0 1.5rem;
   }
 
@@ -447,17 +449,17 @@ const NotifyButton = styled.button`
     margin-top: 2rem;
     height: 4.5rem !important;
     line-height: 4.3rem !important;
-    font-size: 0.8rem;
+    font-size: ${(p) => p.$lang === 'hi' ? '1.05rem' : '0.8rem'};
     padding: 0 1.2rem;
-    letter-spacing: .4rem;
+    letter-spacing: ${(p) => p.$lang === 'hi' ? '0.02em' : '.4rem'};
   }
 
   @media screen and (max-width: 400px) {
     height: 4rem !important;
     line-height: 3.8rem !important;
-    font-size: 0.75rem;
+    font-size: ${(p) => p.$lang === 'hi' ? '1rem' : '0.75rem'};
     padding: 0 1rem;
-    letter-spacing: .3rem;
+    letter-spacing: ${(p) => p.$lang === 'hi' ? '0.02em' : '.3rem'};
   }
 `;
 
@@ -467,6 +469,7 @@ const ParticlesPage: React.FC = () => {
   const particlesRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, signInWithGoogle } = useAuth();
+  const { lang } = useLang();
   const [isConnecting, setIsConnecting] = useState(false);
 
   const handleConnect = async () => {
@@ -643,7 +646,6 @@ const ParticlesPage: React.FC = () => {
       <Preloader isLoading={isLoading} />
       
       <SIntro id="intro">
-        <Header />
         
         <IntroParticles ref={particlesRef} id="particles-js" />
         
@@ -654,18 +656,28 @@ const ParticlesPage: React.FC = () => {
         <IntroContent>
           <Row>
             <Column>
-              <IntroText>
-                <h3>Dev Vani</h3>
+              <IntroText $lang={lang}>
+                <h3>{t(T.home.eyebrow, lang)}</h3>
                 <h1>
-                मन की बात प्रभु संग।<br/>
-यहाँ प्रार्थना बनाती है शांति—<br/>
-तनाव से मुक्ति की राह।
+                  {lang === 'hi' ? (
+                    <>
+                      मन की बात प्रभु संग।<br/>
+                      यहाँ प्रार्थना बनाती है शांति—<br/>
+                      तनाव से मुक्ति की राह।
+                    </>
+                  ) : (
+                    <>
+                      Speak your heart to God.<br/>
+                      Here prayer becomes peace—<br/>
+                      the path to freedom from stress.
+                    </>
+                  )}
                 </h1>
               </IntroText>
 
               <IntroBottom>
-                <NotifyButton onClick={handleConnect}>
-                Connect Now
+                <NotifyButton onClick={handleConnect} $lang={lang}>
+                  {t(T.home.connectBtn, lang)}
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <path d="M24 12l-9-9v7h-15v4h15v7z"/>
                   </svg>
@@ -679,7 +691,7 @@ const ParticlesPage: React.FC = () => {
 
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         <SocialLinks />
-        <ScrollLinkComponent target="#info">Scroll For More</ScrollLinkComponent>
+        <ScrollLinkComponent target="#info">{t(T.home.scrollMore, lang)}</ScrollLinkComponent>
       </SIntro>
 
       <InfoSection />

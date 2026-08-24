@@ -43,10 +43,10 @@ export function detectMurfStyle(userMessage: string): MurfStyle {
   return 'Conversational';
 }
 
-/** hi-IN-shaan supports all four styles natively; Carter needs fallbacks. */
+/** Aman + hi-IN-shaan support all four styles natively; Carter needs fallbacks. */
 export function resolveStyleForVoice(style: MurfStyle, voiceId: string): string {
   const id = voiceId.toLowerCase();
-  if (id.includes('shaan')) return style;
+  if (id.includes('shaan') || id.includes('aman')) return style;
 
   if (id.includes('carter')) {
     const map: Record<MurfStyle, string> = {

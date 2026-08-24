@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Header from './Header';
 import Preloader from './Preloader';
 import Modal from './Modal';
 import SocialLinks from './SocialLinks';
@@ -356,7 +355,6 @@ const StaticPage: React.FC = () => {
       <Preloader isLoading={isLoading} />
       
       <SIntro id="intro">
-        <Header />
         
         <GridOverlay>
           <div></div>

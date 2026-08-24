@@ -6,6 +6,7 @@ import styled, { keyframes, css } from "styled-components";
 import { useRouter, useParams } from "next/navigation";
 import { Mic, MicOff, Send, ArrowLeft } from "lucide-react";
 import { getLord, type LordConfig } from "@/lib/lords";
+import { consumeTalkStream } from "@/lib/talkStream";
 import { useAuth } from "@/context/AuthContext";
 import SubscriptionModal from "./SubscriptionModal";
 
@@ -81,10 +82,9 @@ const TopBar = styled.div`
   z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end; /* Push StatusPill to the right */
   padding: 1.2rem 1.6rem;
   padding-top: max(1.2rem, env(safe-area-inset-top));
-  background: linear-gradient(to bottom, rgba(0,0,0,.7) 0%, transparent 100%);
   pointer-events: none;
   > * { pointer-events: auto; }
 `;
@@ -976,52 +976,88 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
           setShowSubscriptionModal(true);
           return;
         }
-        throw new Error(`API call failed: ${response.status}`);
+        const errBody = await response.json().catch(() => ({})) as { error?: string };
+        throw new Error(errBody.error || `API call failed: ${response.status}`);
       }
 
-      const result = await response.json() as {
-        audioFile?: string;
-        transcript?: string;
-      };
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("text/event-stream")) {
+        throw new Error("Unexpected response from server");
+      }
 
-      const transcript = result.transcript || "";
+      let transcript = "";
+      const audioChunks: Uint8Array[] = [];
+      let streamError: string | null = null;
 
-      if (result.audioFile) {
-        stopPlayback();
-
-        const audio = audioRef.current;
-        if (!audio) return;
-
-        audio.src = result.audioFile;
-        audio.load();
-
-        await new Promise<void>((resolve) => {
-          const onReady = () => { cleanup(); resolve(); };
-          const onError = () => { cleanup(); resolve(); };
-          const cleanup = () => {
-            audio.removeEventListener("canplaythrough", onReady);
-            audio.removeEventListener("error", onError);
-          };
-          if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) { resolve(); return; }
-          audio.addEventListener("canplaythrough", onReady);
-          audio.addEventListener("error", onError);
-        });
-
-        // Build captions from transcript + audio duration
-        if (transcript) {
-          const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 20;
-          const durations = buildFakeWordDurations(transcript, dur);
-          setWordDurations(durations);
-          wordDurationsRef.current = durations;
+      await consumeTalkStream(response, async (event) => {
+        if (event.type === "transcript") {
+          transcript = event.transcript;
+          if (transcript) {
+            const estDur = Math.max(8, transcript.split(/\s+/).length * 0.45);
+            const durations = buildFakeWordDurations(transcript, estDur);
+            setWordDurations(durations);
+            wordDurationsRef.current = durations;
+            setShowCaption(true);
+          }
+        } else if (event.type === "audio") {
+          audioChunks.push(event.chunk);
+        } else if (event.type === "error") {
+          streamError = event.message;
         }
+      });
 
-        setIsAudioPlaying(true);
-        // Start animated lord video loop in sync with audio (free — no API)
-        await startSpeakingVideo();
-        await startBackgroundMusic();
-        await audio.play();
-        startCaptionSync(() => audio.currentTime);
+      if (streamError) {
+        throw new Error(streamError);
       }
+
+      if (audioChunks.length === 0) {
+        throw new Error("No audio received");
+      }
+
+      stopPlayback();
+
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      const totalBytes = audioChunks.reduce((n, c) => n + c.length, 0);
+      const merged = new Uint8Array(totalBytes);
+      let offset = 0;
+      for (const chunk of audioChunks) {
+        merged.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      const blob = new Blob([merged], { type: "audio/mpeg" });
+      const blobUrl = URL.createObjectURL(blob);
+      audioBlobUrlRef.current = blobUrl;
+
+      audio.src = blobUrl;
+      audio.load();
+
+      await new Promise<void>((resolve) => {
+        const onReady = () => { cleanup(); resolve(); };
+        const onError = () => { cleanup(); resolve(); };
+        const cleanup = () => {
+          audio.removeEventListener("canplaythrough", onReady);
+          audio.removeEventListener("error", onError);
+        };
+        if (audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) { resolve(); return; }
+        audio.addEventListener("canplaythrough", onReady);
+        audio.addEventListener("error", onError);
+      });
+
+      if (transcript) {
+        const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 20;
+        const durations = buildFakeWordDurations(transcript, dur);
+        setWordDurations(durations);
+        wordDurationsRef.current = durations;
+      }
+
+      setIsAudioPlaying(true);
+      await startSpeakingVideo();
+      await startBackgroundMusic();
+      await audio.play();
+      startCaptionSync(() => audio.currentTime);
     } catch (err) {
       console.error("Error calling audio assistant:", err);
       showToastMessage("Could not connect. Please try again.");
@@ -1119,10 +1155,6 @@ const TalkPageContent: React.FC<{ lord: LordConfig }> = ({ lord }) => {
       <ParticlesContainer ref={particlesRef} />
 
       <TopBar>
-        <BackButton type="button" onClick={() => router.push("/choose")}>
-          <ArrowLeft /> Back
-        </BackButton>
-        <BrandLabel>{lord.brandLabel}</BrandLabel>
         <StatusPill $state={sessionState}>
           <StatusDot $state={sessionState} />
           {statusLabel[sessionState]}
