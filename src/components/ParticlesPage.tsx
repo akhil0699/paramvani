@@ -7,6 +7,7 @@ import Modal from './Modal';
 import SocialLinks from './SocialLinks';
 import ScrollLinkComponent from './ScrollLink';
 import InfoSection from './InfoSection';
+import GitaHomeCard from './GitaHomeCard';
 import { useAuth, POST_LOGIN_REDIRECT_KEY } from '@/context/AuthContext';
 import { useLang } from '@/context/LanguageContext';
 import { translations as T, t } from '@/lib/translations';
@@ -694,6 +695,7 @@ const ParticlesPage: React.FC = () => {
         <ScrollLinkComponent target="#info">{t(T.home.scrollMore, lang)}</ScrollLinkComponent>
       </SIntro>
 
+      <GitaHomeCard />
       <InfoSection />
     </>
   );

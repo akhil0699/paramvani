@@ -11,6 +11,7 @@ import { auth, db } from "@/lib/firebase/client";
 import { deleteUser } from "firebase/auth";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import SubscriptionModal from "./SubscriptionModal";
+import { CHAPTERS } from "@/lib/gitaData";
 
 // ─── Animations ──────────────────────────────────────────────────────────────
 const fadeUp = keyframes`
@@ -368,6 +369,81 @@ const ModalActions = styled.div`
   }
 `;
 
+// ─── Gita Card ────────────────────────────────────────────────────────────────
+const GitaCard = styled.div`
+  background: linear-gradient(135deg, rgba(212,164,26,0.08) 0%, rgba(180,90,10,0.05) 100%);
+  border: 1px solid rgba(212, 164, 26, 0.25);
+  border-radius: 18px;
+  padding: 1.75rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(212, 164, 26, 0.5);
+    background: linear-gradient(135deg, rgba(212,164,26,0.14) 0%, rgba(180,90,10,0.08) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(212,164,26,0.15);
+  }
+`;
+
+const GitaCardContent = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+
+const GitaCardText = styled.p`
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.55);
+  margin: 0 0 1rem;
+  line-height: 1.6;
+  flex: 1 1 200px;
+`;
+
+const GitaChapterPills = styled.div`
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+`;
+
+const GitaChapterPill = styled.span`
+  font-family: 'Gothic A1', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(212,164,26,0.3);
+  background: rgba(212,164,26,0.08);
+  color: #d4a41a;
+`;
+
+const GitaArrow = styled.div`
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(212,164,26,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4a41a;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  transition: all 0.2s;
+
+  ${GitaCard}:hover & {
+    background: rgba(212,164,26,0.15);
+    transform: translateX(3px);
+  }
+`;
+
 // ─── Legal pages config ───────────────────────────────────────────────────────
 const LEGAL = [
   { href: "/privacy-policy",       icon: "fa-shield-halved", labelKey: "privacy" as const },
@@ -510,6 +586,32 @@ export default function ProfilePage() {
             </StatItem>
           </StatsGrid>
         </Card>
+
+        {/* ── Gita Shortcut ── */}
+        <GitaCard as={Link} href="/gita">
+          <CardTitle style={{ marginBottom: '0.5rem' }}>
+            <i className="fa-solid fa-om" style={{ color: '#d4a41a' }} />
+            {lang === 'hi' ? 'भगवद्गीता' : 'Bhagavad Gita'}
+          </CardTitle>
+          <GitaCardContent>
+            <GitaCardText>
+              {lang === 'hi'
+                ? 'श्रीमद्भगवद्गीता के सभी 18 अध्यायों के श्लोक पढ़ें, सुनें और अनुभव करें।'
+                : 'Read, listen and experience shloks from all 18 chapters of the Bhagavad Gita.'}
+            </GitaCardText>
+            <GitaChapterPills>
+              {CHAPTERS.slice(0, 6).map(ch => (
+                <GitaChapterPill key={ch.number}>
+                  {lang === 'hi' ? `अ.${ch.number}` : `Ch.${ch.number}`}
+                </GitaChapterPill>
+              ))}
+              <GitaChapterPill style={{ opacity: 0.5 }}>+12</GitaChapterPill>
+            </GitaChapterPills>
+            <GitaArrow>
+              <i className="fa-solid fa-arrow-right" />
+            </GitaArrow>
+          </GitaCardContent>
+        </GitaCard>
 
         {/* ── Account Actions ── */}
         <Card>

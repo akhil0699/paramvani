@@ -3,6 +3,7 @@
 import React from "react";
 import styled from "styled-components";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useLang } from "@/context/LanguageContext";
 import { translations as T, t } from "@/lib/translations";
 
@@ -43,6 +44,11 @@ const FooterLink = styled(Link)`
 
 export default function Footer() {
   const { lang } = useLang();
+  const pathname = usePathname();
+
+  if (pathname.startsWith('/gita') || pathname.startsWith('/talk')) {
+    return null;
+  }
 
   const LINKS = [
     { href: "/privacy-policy",       label: t(T.footer.privacy, lang) },
