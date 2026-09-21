@@ -30,22 +30,31 @@ const fadeIn = keyframes`
 // ─── Wrapper ──────────────────────────────────────────────────────────────────
 
 const Wrapper = styled.section`
-  background: #0a0600;
-  padding: 6rem 2rem;
+  padding: 0 2rem;
+  margin-top: -100px;
+  margin-bottom: 0;
+  padding-bottom: 6rem;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden;
-
+  z-index: 10;
+  background-color: #0B0806;
+  
+  /* Ambient glow from top */
   &::before {
     content: '';
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse at 20% 50%, rgba(212,164,26,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 50%, rgba(180,80,20,0.08) 0%, transparent 60%);
+      radial-gradient(ellipse at 50% 30%, rgba(255,153,51,0.06) 0%, transparent 60%);
     pointer-events: none;
+  }
+
+  @media screen and (max-width: 800px) {
+    margin-top: -60px;
+    padding: 0 1rem;
+    padding-bottom: 4rem;
   }
 `;
 
@@ -54,51 +63,39 @@ const Wrapper = styled.section`
 const Card = styled(Link)`
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 3rem;
-  max-width: 900px;
+  text-align: center;
+  gap: 2rem;
+  max-width: 800px;
   width: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(212,164,26,0.07) 0%,
-    rgba(0,0,0,0) 40%,
-    rgba(180,80,20,0.05) 100%
-  );
-  border: 1px solid rgba(212,164,26,0.28);
+  
+  /* Glassmorphism */
+  background: rgba(11, 8, 6, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
-  padding: 3rem 3.5rem;
+  padding: 4rem 3rem;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: all 0.4s ease;
   animation: ${fadeIn} 0.7s ease both;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(135deg, rgba(212,164,26,0.12), transparent 60%);
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 
   &:hover {
-    border-color: rgba(212,164,26,0.55);
+    border-color: rgba(255, 153, 51, 0.5);
     transform: translateY(-4px);
     box-shadow:
-      0 20px 60px rgba(0,0,0,0.5),
-      0 0 40px rgba(212,164,26,0.12);
-
-    &::before { opacity: 1; }
+      0 20px 60px rgba(0,0,0,0.6),
+      0 0 40px rgba(255, 153, 51, 0.15);
   }
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    padding: 2.5rem 2rem;
-    gap: 2rem;
-    text-align: center;
+    padding: 3rem 1.5rem;
+    gap: 1.5rem;
+    border-radius: 20px;
   }
 `;
 
@@ -160,20 +157,9 @@ const Eyebrow = styled.p`
   text-transform: uppercase;
   color: #d4a41a;
   margin: 0 0 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-
-  &::before {
-    content: '';
-    width: 1.5rem;
-    height: 1px;
-    background: #d4a41a;
-    flex-shrink: 0;
-  }
+  justify-content: center;
 
   @media (max-width: 768px) {
-    justify-content: center;
     &::before { display: none; }
   }
 `;
@@ -246,27 +232,7 @@ const StatLabel = styled.span`
 
 // ─── CTA Arrow ────────────────────────────────────────────────────────────────
 
-const Arrow = styled.div`
-  flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 1px solid rgba(212,164,26,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d4a41a;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
 
-  ${Card}:hover & {
-    background: rgba(212,164,26,0.15);
-    transform: translateX(4px);
-    border-color: rgba(212,164,26,0.7);
-  }
-
-  @media (max-width: 768px) { display: none; }
-`;
 
 // ─── Viewed Badge ─────────────────────────────────────────────────────────────
 
@@ -354,10 +320,6 @@ const GitaHomeCard: React.FC = () => {
             )}
           </StatsRow>
         </Content>
-
-        <Arrow>
-          <i className="fa-solid fa-arrow-right" />
-        </Arrow>
       </Card>
     </Wrapper>
   );

@@ -22,10 +22,10 @@ const fadeIn = keyframes`
 
 const cardGlow = keyframes`
   0%, 100% {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(141, 198, 63, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 153, 51, 0.15);
   }
   50% {
-    box-shadow: 0 12px 40px rgba(141, 198, 63, 0.12), 0 0 0 1px rgba(141, 198, 63, 0.35);
+    box-shadow: 0 12px 40px rgba(255, 153, 51, 0.12), 0 0 0 1px rgba(255, 153, 51, 0.35);
   }
 `;
 
@@ -71,7 +71,7 @@ const BackButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(141, 198, 63, 0.25);
+  border: 1px solid rgba(255, 153, 51, 0.25);
   border-radius: 999px;
   padding: 0.5rem 1rem;
   color: rgba(255, 255, 255, 0.85);
@@ -81,8 +81,8 @@ const BackButton = styled.button`
   backdrop-filter: blur(12px);
 
   &:hover {
-    background: rgba(141, 198, 63, 0.12);
-    border-color: rgba(141, 198, 63, 0.5);
+    background: rgba(255, 153, 51, 0.12);
+    border-color: rgba(255, 153, 51, 0.5);
   }
 
   svg {
@@ -102,7 +102,7 @@ const Eyebrow = styled.p`
   font-size: 0.75rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #8dc63f;
+  color: #FF9933;
   margin: 0 0 0.75rem;
 `;
 
@@ -165,7 +165,7 @@ const LordCard = styled.button<{ $delay: number }>`
   }
 
   &:hover .card-frame {
-    border-color: rgba(141, 198, 63, 0.55);
+    border-color: rgba(255, 153, 51, 0.55);
     animation: ${cardGlow} 2s ease-in-out infinite;
   }
 `;
@@ -173,7 +173,7 @@ const LordCard = styled.button<{ $delay: number }>`
 const CardFrame = styled.div.attrs({ className: 'card-frame' })`
   border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(141, 198, 63, 0.2);
+  border: 1px solid rgba(255, 153, 51, 0.2);
   background: #0a1a0a;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 `;
@@ -227,7 +227,7 @@ const LordNameEn = styled.p`
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #8dc63f;
+  color: #FF9933;
   margin: 0 0 0.5rem;
 `;
 
@@ -246,7 +246,7 @@ const ConnectHint = styled.span`
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(141, 198, 63, 0.85);
+  color: rgba(255, 153, 51, 0.85);
 `;
 
 const ChooseLordPage: React.FC = () => {
@@ -283,7 +283,7 @@ const ChooseLordPage: React.FC = () => {
       vy = (Math.random() - 0.5) * 0.4;
       size = Math.random() * 1.5 + 0.5;
       opacity = Math.random() * 0.5 + 0.2;
-      color = ['#ffffff', '#8dc63f', '#a0d448'][Math.floor(Math.random() * 3)];
+      color = ['#ffffff', '#FF9933', '#FFD700'][Math.floor(Math.random() * 3)];
 
       update() {
         this.x += this.vx;

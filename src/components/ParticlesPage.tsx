@@ -1,704 +1,741 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Preloader from './Preloader';
-import Modal from './Modal';
-import SocialLinks from './SocialLinks';
-import ScrollLinkComponent from './ScrollLink';
 import InfoSection from './InfoSection';
-import GitaHomeCard from './GitaHomeCard';
 import { useAuth, POST_LOGIN_REDIRECT_KEY } from '@/context/AuthContext';
 import { useLang } from '@/context/LanguageContext';
 import { translations as T, t } from '@/lib/translations';
+import { SHLOKS } from '@/lib/gitaData';
 
-const SIntro = styled.section`
+// ─── Animations ───────────────────────────────────────────────────────────────
+const floatUp = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+`;
+const glowPulse = keyframes`
+  0%, 100% { opacity: 0.5; box-shadow: 0 0 20px rgba(212,164,26,0.3); }
+  50%       { opacity: 1;   box-shadow: 0 0 40px rgba(212,164,26,0.6); }
+`;
+const shimmer = keyframes`
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+`;
+const fadeInUp = keyframes`
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+`;
+const particleDrift = keyframes`
+  0%   { transform: translateY(0px) translateX(0px); opacity: 0.4; }
+  50%  { transform: translateY(-20px) translateX(10px); opacity: 0.8; }
+  100% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
+`;
+
+// ─── Wrapper ──────────────────────────────────────────────────────────────────
+const PageWrapper = styled.div`
+  background-color: #0B0806;
+  min-height: 100vh;
   width: 100%;
-  height: 100vh;
-  min-height: 82rem;
-  background-color: #010e0f;
   overflow: hidden;
-  position: relative;
-
-  &::after {
-    display: block;
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
-  }
 `;
 
-const HeroImage = styled.div`
-  flex: 1;
-  max-width: 45%;
-  height: 400px;
-  background-image: url('/hero-image.png');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 4px;
-  margin-left: 3rem;
- 
-  position: relative;
+// ─── Hero Section ─────────────────────────────────────────────────────────────
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(1, 14, 15, 0.3);
-    border-radius: 4px;
-    z-index: 1;
-  }
-
-  @media screen and (max-width: 1200px) {
-    height: 450px;
-    margin-left: 2rem;
-  }
-
-  @media screen and (max-width: 1024px) {
-    height: 400px;
-    margin-left: 1.5rem;
-  }
-
-  @media screen and (max-width: 800px) {
-    flex: none;
-    width: 100%;
-    max-width: 100%;
-    height: 250px;
-    margin-left: 0;
-    margin-top: 2rem;
-  }
-
-  @media screen and (max-width: 600px) {
-    height: 390px;
-  }
-
-  @media screen and (max-width: 400px) {
-    height: 350px;
-  }
-`;
-
-const IntroParticles = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
+const SHero = styled.section`
   width: 100%;
-  height: 100%;
-  background-color: transparent;
-  padding: 0;
-  margin: 0;
-  opacity: .35;
-
-  canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-`;
-
-const GridOverlay = styled.div`
-  z-index: 2;
-  display: block;
-  width: 89%;
-  height: 100%;
-  max-width: 1200px;
-  opacity: .65;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  transform: translate3d(-50%, 0, 0);
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 50%;
-
-  > div,
-  &::before,
-  &::after {
-    background-color: rgba(255, 255, 255, 0.1);
-    height: 100%;
-    width: 1px;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-  }
-
-  &::before {
-    content: "";
-    left: 25%;
-  }
-
-  &::after {
-    content: "";
-    right: 25%;
-  }
-
-  > div {
-    left: 50%;
-  }
-
-  @media screen and (max-width: 1600px) {
-    border-right: none !important;
-    border-left: none !important;
-
-    &::before {
-      left: 22.5%;
-    }
-
-    &::after {
-      right: 22.5%;
-    }
-  }
-
-  @media screen and (max-width: 400px) {
-    > div,
-    &::before,
-    &::after {
-      display: none;
-    }
-  }
-`;
-
-const IntroContent = styled.div`
-  z-index: 3;
-  height: 100%;
-  padding-top: 15vh;
-  padding-bottom: 20rem;
-  align-items: center;
+  min-height: 100vh;
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-
-  @media screen and (max-width: 800px) {
-    padding-top: 12rem;
-    padding-bottom: 16rem;
-  }
-
-  @media screen and (max-width: 600px) {
-    padding-top: 10rem;
-    padding-bottom: 12rem;
-  }
-`;
-
-const Row = styled.div`
-  width: 89%;
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  flex-flow: row wrap;
-  position: relative;
-  z-index: 2;
   align-items: center;
-
-  @media screen and (max-width: 1700px) {
-    max-width: 1200px;
-  }
-
-  @media screen and (max-width: 1600px) {
-    max-width: 1080px;
-  }
-
-  @media screen and (max-width: 1400px) {
-    max-width: 900px;
-  }
-
-  @media screen and (max-width: 1200px) {
-    max-width: 800px;
-  }
-
-  @media screen and (max-width: 1024px) {
-    max-width: 600px;
-  }
-
-  @media screen and (max-width: 800px) {
-    max-width: 90vw;
-    flex-direction: column;
-    padding-top: 0;
-  }
-
-  @media screen and (max-width: 600px) {
-    max-width: 95vw;
-    padding-bottom: 0;
-  }
-
-  @media screen and (max-width: 500px) {
-    max-width: 95vw;
-  }
-`;
-
-const Column = styled.div`
-  flex: 1;
-  max-width: 55%;
-  padding: 0 20px;
-
-  @media screen and (max-width: 800px) {
-    max-width: 100%;
-    padding: 0 10px;
-  }
-
-  @media screen and (max-width: 600px) {
-    padding: 0 5px;
-  }
-`;
-
-const IntroText = styled.div<{ $lang?: string }>`
-  h3 {
-    display: inline-block;
-    font-family: ${(p) => p.$lang === 'hi' ? '"Noto Sans Devanagari", "Gothic A1", sans-serif' : '"Gothic A1", sans-serif'};
-    font-weight: ${(p) => p.$lang === 'hi' ? '500' : '400'};
-    font-size: ${(p) => p.$lang === 'hi' ? '1.4rem' : '1.2rem'};
-    line-height: 1.8rem;
-    text-transform: ${(p) => p.$lang === 'hi' ? 'none' : 'uppercase'};
-    letter-spacing: ${(p) => p.$lang === 'hi' ? '0.02em' : '.3em'};
-    color: #8dc63f;
-    padding-left: .6rem;
-    margin-top: 0;
-    margin-bottom: .8rem;
-    position: relative;
-
-    &::before {
-      content: "";
-      display: block;
-      width: 7.2rem;
-      height: 1px;
-      background-color: rgba(255, 255, 255, 0.15);
-      position: absolute;
-      top: 1rem;
-      right: calc(100% + 2.8rem);
-    }
-
-    @media screen and (max-width: 1100px) {
-      &::before {
-        width: 4rem;
-      }
-    }
-
-    @media screen and (max-width: 800px) {
-      &::before {
-        display: none;
-      }
-    }
-
-    @media screen and (max-width: 600px) {
-      font-size: ${(p) => p.$lang === 'hi' ? '1.15rem' : '1rem'};
-    }
-
-    @media screen and (max-width: 400px) {
-      font-size: ${(p) => p.$lang === 'hi' ? '1.05rem' : '0.9rem'};
-    }
-  }
-
-  h1 {
-    font-family: "DM Serif Display", serif;
-    font-weight: 400;
-    font-size: 6.5rem;
-    line-height: 1.2;
-    color: #ffffff;
-    letter-spacing: normal;
-    margin-top: 0;
-    margin-bottom: .8rem;
-
-    @media screen and (max-width: 1800px) {
-      font-size: 6rem;
-    }
-
-    @media screen and (max-width: 1600px) {
-      font-size: 5.5rem;
-    }
-
-    @media screen and (max-width: 1400px) {
-      font-size: 5rem;
-    }
-
-    @media screen and (max-width: 1200px) {
-      font-size: 4.5rem;
-    }
-
-    @media screen and (max-width: 1024px) {
-      font-size: 4rem;
-    }
-
-    @media screen and (max-width: 800px) {
-      font-size: 3.5rem;
-
-      br {
-        display: none;
-      }
-    }
-
-    @media screen and (max-width: 700px) {
-      font-size: 3.2rem;
-    }
-
-    @media screen and (max-width: 600px) {
-      font-size: 2.8rem;
-    }
-
-    @media screen and (max-width: 500px) {
-      font-size: 2.5rem;
-    }
-
-    @media screen and (max-width: 400px) {
-      font-size: 2.2rem;
-    }
-
-    @media screen and (max-width: 350px) {
-      font-size: 2rem;
-    }
-  }
-`;
-
-const IntroBottom = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  align-items: flex-start;
-  position: static;
-  margin-top: 2.5rem;
-  left: 0;
-  bottom: auto;
-  gap: 2rem;
-
-  @media screen and (max-width: 800px) {
-    margin-top: 2rem;
-  }
-
-  @media screen and (max-width: 600px) {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 1.5rem;
-    gap: 1.5rem;
-  }
-
-  @media screen and (max-width: 500px) {
-    margin-right: 0;
-    margin-top: 1rem;
-    gap: 1rem;
-  }
-`;
-
-const NotifyButton = styled.button<{ $lang?: string }>`
-  z-index: 2;
-  font-size: 1rem;
-  margin: 0;
-  height: 5.6rem !important;
-  line-height: 5.4rem !important;
-  border: 1px solid #ffffff !important;
-  color: #ffffff;
-  cursor: pointer;
+  justify-content: flex-start;
   overflow: hidden;
-  position: relative;
-  background: transparent;
-  padding: 0 2rem;
-  font-family: ${(p) => p.$lang === 'hi' ? '"Noto Sans Devanagari", "Gothic A1", sans-serif' : '"Gothic A1", sans-serif'};
-  font-weight: ${(p) => p.$lang === 'hi' ? '500' : '700'};
-  text-transform: ${(p) => p.$lang === 'hi' ? 'none' : 'uppercase'};
-  letter-spacing: ${(p) => p.$lang === 'hi' ? '0.02em' : '.6rem'};
-  font-size: ${(p) => p.$lang === 'hi' ? '1.3rem' : '1rem'};
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  background: #0B0806;
+`;
 
-  svg {
-    fill: #ffffff;
-    height: 1rem;
-    width: 1rem;
-    margin-left: .4rem;
-  }
+const HeroBg = styled.div`
+  position: absolute;
+  inset: 0;
+  background-image: url('/hero.png');
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  z-index: 0;
 
-  &::before {
-    z-index: -1;
-    content: "";
-    height: 100%;
-    width: 0;
-    background-color: #ffffff;
-    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  /* Dark overlay so text is readable */
+  &::after {
+    content: '';
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(11, 8, 6, 0.5) 0%,
+      rgba(11, 8, 6, 0.2) 30%,
+      rgba(11, 8, 6, 0.35) 60%,
+      rgba(11, 8, 6, 0.95) 100%
+    );
   }
+`;
+
+const ParticlesLayer = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.55;
+
+  canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+`;
+
+const HeroContent = styled.div`
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 1.5rem;
+  padding-top: 61vh;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+
+  @media (max-width: 600px) {
+    padding-top: 55vh;
+  }
+`;
+
+const HeroEyebrow = styled.p`
+  font-family: 'Gothic A1', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #FF9933;
+  margin: 0 0 1.2rem;
+  animation: ${fadeInUp} 0.6s ease both;
+`;
+
+const HeroTitle = styled.h1<{ $lang?: string }>`
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  line-height: 1.18;
+  color: #fff8e1;
+  margin: 0 0 2rem;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  animation: ${fadeInUp} 0.7s 0.1s ease both;
+
+  ${p => p.$lang === 'hi' && `
+    font-family: "Noto Sans Devanagari", "DM Serif Display", serif;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+  `}
+
+  @media (max-width: 500px) {
+    font-size: 2.2rem;
+  }
+`;
+
+const ConnectBtn = styled.button<{ $lang?: string }>`
+  background: linear-gradient(135deg, #FF9933 0%, #FF7E27 100%);
+  border: none;
+  border-radius: 50px;
+  color: #1a0a00;
+  font-family: 'Gothic A1', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.03em;
+  padding: 1rem 2.8rem;
+  cursor: pointer;
+  box-shadow: 0 4px 24px rgba(255,153,51,0.45);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: ${fadeInUp} 0.8s 0.2s ease both;
+
+  ${p => p.$lang === 'hi' && `
+    font-family: "Noto Sans Devanagari", "Gothic A1", sans-serif;
+    font-size: 1.2rem;
+  `}
 
   &:hover {
-    color: #000000;
-
-    svg {
-      fill: #000000;
-    }
-
-    &::before {
-      width: 100%;
-    }
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(255,153,51,0.6);
   }
 
-  @media screen and (max-width: 800px) {
-    margin-top: 2.5rem;
-    height: 5rem !important;
-    line-height: 4.8rem !important;
-    font-size: ${(p) => p.$lang === 'hi' ? '1.15rem' : '0.9rem'};
-    padding: 0 1.5rem;
+  span.emoji {
+    font-size: 1.2rem;
   }
 
-  @media screen and (max-width: 600px) {
-    margin-top: 2rem;
-    height: 4.5rem !important;
-    line-height: 4.3rem !important;
-    font-size: ${(p) => p.$lang === 'hi' ? '1.05rem' : '0.8rem'};
-    padding: 0 1.2rem;
-    letter-spacing: ${(p) => p.$lang === 'hi' ? '0.02em' : '.4rem'};
-  }
-
-  @media screen and (max-width: 400px) {
-    height: 4rem !important;
-    line-height: 3.8rem !important;
-    font-size: ${(p) => p.$lang === 'hi' ? '1rem' : '0.75rem'};
-    padding: 0 1rem;
-    letter-spacing: ${(p) => p.$lang === 'hi' ? '0.02em' : '.3rem'};
+  @media (max-width: 500px) {
+    font-size: 1rem;
+    padding: 0.9rem 2.2rem;
   }
 `;
 
-const ParticlesPage: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+// ─── Spacer to push carousel below the image's focal point ───────────────────
+const HeroSpacer = styled.div`
+  position: relative;
+  z-index: 2;
+  /* This gives space for the background image to show */
+  flex: 1;
+  min-height: 30vh;
+
+  @media (max-width: 600px) {
+    min-height: 22vh;
+  }
+`;
+
+// ─── Carousel Section ─────────────────────────────────────────────────────────
+
+const CarouselSection = styled.div`
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: 0 0 3rem;
+  background: transparent;
+  /* Negative margin to overlap with hero bg image bottom */
+  margin-top: -6rem;
+`;
+
+const CarouselTrack = styled.div`
+  display: flex;
+  gap: 1.2rem;
+  padding: 0 5%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  @media (min-width: 801px) {
+    justify-content: center;
+  }
+`;
+
+const CarouselDots = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+`;
+
+const Dot = styled.div<{ $active?: boolean }>`
+  width: ${p => p.$active ? '20px' : '6px'};
+  height: 6px;
+  border-radius: 3px;
+  background: ${p => p.$active ? '#FF9933' : 'rgba(255,255,255,0.25)'};
+  transition: all 0.3s ease;
+`;
+
+// ─── Shared Card Base ─────────────────────────────────────────────────────────
+
+const CardBase = styled.div`
+  flex: 0 0 85%;
+  max-width: 380px;
+  scroll-snap-align: start;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+`;
+
+// ─── Gita Card ────────────────────────────────────────────────────────────────
+
+const GitaCard = styled(Link)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  background: rgba(10, 6, 0, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  transition: all 0.35s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+
+  &:hover {
+    border-color: rgba(255,153,51,0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 40px rgba(255,153,51,0.1);
+  }
+`;
+
+const OmRing = styled.div`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,164,26,0.25) 0%, rgba(180,80,20,0.08) 60%, transparent 100%);
+  border: 2px solid rgba(212,164,26,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: ${floatUp} 4s ease-in-out infinite;
+  margin-bottom: 1.2rem;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(212,164,26,0.25);
+  }
+  &::before { inset: -10px; animation: ${glowPulse} 2.5s ease-in-out infinite; }
+  &::after  { inset: -18px; opacity: 0.4; animation: ${glowPulse} 3.5s 0.5s ease-in-out infinite; }
+`;
+
+const OmText = styled.span`
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 3rem;
+  background: linear-gradient(135deg, #d4a41a, #f0c84a, #d4a41a);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ${shimmer} 3s linear infinite;
+  line-height: 1;
+`;
+
+const CardEyebrow = styled.p`
+  font-family: 'Gothic A1', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #d4a41a;
+  margin: 0 0 0.5rem;
+`;
+
+const CardTitle = styled.h2`
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0 0 1rem;
+  color: #fff;
+  line-height: 1.2;
+
+  span {
+    background: linear-gradient(135deg, #fff8e1 0%, #d4a41a 60%, #fff8e1 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: ${shimmer} 4s linear infinite;
+  }
+
+  @media (max-width: 400px) { font-size: 1.7rem; }
+`;
+
+const CardDesc = styled.p`
+  font-family: 'Gothic A1', sans-serif;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0 0 1.5rem;
+  line-height: 1.65;
+`;
+
+const StatsRow = styled.div`
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+`;
+
+const Stat = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+`;
+
+const StatNum = styled.span`
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.8rem;
+  color: #d4a41a;
+  line-height: 1;
+`;
+
+const StatLabel = styled.span`
+  font-family: 'Gothic A1', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+`;
+
+// ─── Connect Card ─────────────────────────────────────────────────────────────
+
+const ConnectCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  background: rgba(10, 6, 0, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: all 0.35s ease;
+
+  &:hover {
+    border-color: rgba(255,153,51,0.4);
+    transform: translateY(-4px);
+  }
+`;
+
+const ConnectIconRing = styled.div`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,153,51,0.25) 0%, rgba(255,80,0,0.08) 60%, transparent 100%);
+  border: 2px solid rgba(255,153,51,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  position: relative;
+  animation: ${floatUp} 4s 1s ease-in-out infinite;
+  margin-bottom: 1.2rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,153,51,0.25);
+    animation: ${glowPulse} 2.5s ease-in-out infinite;
+  }
+`;
+
+const ConnectCardTitle = styled.h2`
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0 0 1rem;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #FF9933, #FFD700, #FF9933);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ${shimmer} 3s linear infinite;
+
+  @media (max-width: 400px) { font-size: 1.7rem; }
+`;
+
+const ConnectCardDesc = styled.p`
+  font-family: 'Gothic A1', sans-serif;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0 0 1.8rem;
+  line-height: 1.65;
+`;
+
+const ConnectCardBtn = styled.button`
+  background: linear-gradient(135deg, #FF9933 0%, #FF7E27 100%);
+  border: none;
+  border-radius: 50px;
+  color: #1a0a00;
+  font-family: 'Gothic A1', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.8rem 2.2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255,153,51,0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,153,51,0.6);
+  }
+`;
+
+// ─── Info Section Wrapper already in InfoSection.tsx ─────────────────────────
+
+const Page: React.FC = () => {
+  const [isLoading, setIsLoading]     = useState(true);
+  const [activeCard, setActiveCard]   = useState(0);
+  const [viewedCount, setViewedCount] = useState(0);
   const particlesRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const carouselRef  = useRef<HTMLDivElement>(null);
+  const router       = useRouter();
   const { user, signInWithGoogle } = useAuth();
-  const { lang } = useLang();
+  const { lang }     = useLang();
   const [isConnecting, setIsConnecting] = useState(false);
+  const totalShloks = SHLOKS.length;
 
+  // ── auth redirect
   const handleConnect = async () => {
-    if (user) {
-      router.push('/choose');
-      return;
-    }
-
+    if (user) { router.push('/choose'); return; }
     if (isConnecting) return;
-
     setIsConnecting(true);
     try {
-      const signedIn = await signInWithGoogle();
-      if (signedIn) {
-        router.push('/choose');
-      }
-    } finally {
-      setIsConnecting(false);
-    }
+      const ok = await signInWithGoogle();
+      if (ok) router.push('/choose');
+    } finally { setIsConnecting(false); }
   };
 
   React.useEffect(() => {
     if (!user) return;
-
     const redirect = sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY);
-    if (redirect) {
-      sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
-      router.push(redirect);
-    }
+    if (redirect) { sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY); router.push(redirect); }
   }, [user, router]);
 
+  // ── preloader
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setIsLoading(false), 1800);
+    return () => clearTimeout(t);
   }, []);
 
-  React.useEffect(() => {
+  // ── read viewed gita count
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem('gita_viewed');
+      if (s) setViewedCount((JSON.parse(s) as string[]).length);
+    } catch { /* ok */ }
+  }, []);
+
+  // ── carousel scroll → dot sync
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const idx = Math.round(el.scrollLeft / el.offsetWidth);
+      setActiveCard(idx);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // ── saffron particles
+  useEffect(() => {
     if (!isLoading && particlesRef.current) {
       const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const ctx    = canvas.getContext('2d');
       if (!ctx) return;
 
-      canvas.style.position = 'absolute';
-      canvas.style.top = '0';
-      canvas.style.left = '0';
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-      canvas.width = window.innerWidth;
+      canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+      canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
-
       particlesRef.current.appendChild(canvas);
 
-      // Particle class
       class Particle {
-        x: number;
-        y: number;
-        vx: number;
-        vy: number;
-        size: number;
-        opacity: number;
-        life: number;
-        maxLife: number;
-
-        constructor() {
-          this.x = Math.random() * canvas.width;
-          this.y = Math.random() * canvas.height;
-          this.vx = (Math.random() - 0.5) * 0.3;
-          this.vy = (Math.random() - 0.5) * 0.3;
-          this.size = Math.random() * 1.5 + 0.5;
-          this.opacity = Math.random() * 0.6 + 0.2;
-          this.life = 0;
-          this.maxLife = Math.random() * 400 + 300;
-        }
+        x = Math.random() * canvas.width;
+        y = Math.random() * canvas.height;
+        vx = (Math.random() - 0.5) * 0.25;
+        vy = (Math.random() - 0.5) * 0.25;
+        size = Math.random() * 1.4 + 0.4;
+        opacity = Math.random() * 0.5 + 0.2;
+        life = 0;
+        maxLife = Math.random() * 400 + 300;
 
         update() {
-          this.x += this.vx;
-          this.y += this.vy;
-          this.life++;
-
-          // Add some floating motion (slower)
-          this.vx += (Math.random() - 0.5) * 0.005;
-          this.vy += (Math.random() - 0.5) * 0.005;
-
-          // Constrain velocity (slower max speed)
-          this.vx = Math.max(-0.8, Math.min(0.8, this.vx));
-          this.vy = Math.max(-0.8, Math.min(0.8, this.vy));
-
-          // Pulsing opacity (slower)
-          this.opacity = Math.max(0.1, Math.min(0.7, this.opacity + (Math.random() - 0.5) * 0.003));
-
-          // Reset if particle is dead or out of bounds
+          this.x += this.vx; this.y += this.vy; this.life++;
+          this.vx += (Math.random() - 0.5) * 0.004;
+          this.vy += (Math.random() - 0.5) * 0.004;
+          this.vx = Math.max(-0.6, Math.min(0.6, this.vx));
+          this.vy = Math.max(-0.6, Math.min(0.6, this.vy));
+          this.opacity = Math.max(0.1, Math.min(0.65, this.opacity + (Math.random() - 0.5) * 0.003));
           if (this.life > this.maxLife || this.x < -50 || this.x > canvas.width + 50 || this.y < -50 || this.y > canvas.height + 50) {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.vx = (Math.random() - 0.5) * 0.3;
-            this.vy = (Math.random() - 0.5) * 0.3;
-            this.opacity = Math.random() * 0.6 + 0.2;
-            this.life = 0;
-            this.maxLife = Math.random() * 400 + 300;
+            this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.25; this.vy = (Math.random() - 0.5) * 0.25;
+            this.opacity = Math.random() * 0.5 + 0.2; this.life = 0; this.maxLife = Math.random() * 400 + 300;
           }
         }
 
         draw() {
           if (!ctx) return;
-          
-          ctx.save();
-          ctx.globalAlpha = this.opacity;
-          
-          // Create glow effect (smaller)
-          const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2);
-          gradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
-          gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
-          gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-          
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
-          ctx.fill();
-          
-          // Draw main particle
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fill();
-          
+          ctx.save(); ctx.globalAlpha = this.opacity;
+          const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+          g.addColorStop(0, 'rgba(255,200,80,0.9)');
+          g.addColorStop(0.5, 'rgba(255,153,51,0.35)');
+          g.addColorStop(1, 'rgba(255,100,0,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#FFD700';
+          ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
           ctx.restore();
         }
       }
 
-      // Create particles
-      const particles: Particle[] = [];
-      for (let i = 0; i < 120; i++) {
-        particles.push(new Particle());
-      }
-
-      // Animation loop
+      const particles = Array.from({ length: 100 }, () => new Particle());
+      let rafId: number;
       const animate = () => {
-        if (!ctx) return;
-        
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        particles.forEach(particle => {
-          particle.update();
-          particle.draw();
-        });
-
-        requestAnimationFrame(animate);
+        particles.forEach(p => { p.update(); p.draw(); });
+        rafId = requestAnimationFrame(animate);
       };
-
       animate();
 
-      // Handle resize
-      const handleResize = () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      };
-
-      window.addEventListener('resize', handleResize);
-
+      const onResize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+      window.addEventListener('resize', onResize);
       return () => {
-        window.removeEventListener('resize', handleResize);
-        if (canvas.parentNode) {
-          canvas.parentNode.removeChild(canvas);
-        }
+        window.removeEventListener('resize', onResize);
+        cancelAnimationFrame(rafId);
+        if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
       };
     }
   }, [isLoading]);
 
   return (
-    <>
+    <PageWrapper>
       <Preloader isLoading={isLoading} />
-      
-      <SIntro id="intro">
-        
-        <IntroParticles ref={particlesRef} id="particles-js" />
-        
-        <GridOverlay>
-          <div></div>
-        </GridOverlay>
 
-        <IntroContent>
-          <Row>
-            <Column>
-              <IntroText $lang={lang}>
-                <h3>{t(T.home.eyebrow, lang)}</h3>
-                <h1>
-                  {lang === 'hi' ? (
-                    <>
-                      मन की बात प्रभु संग।<br/>
-                      यहाँ प्रार्थना बनाती है शांति—<br/>
-                      तनाव से मुक्ति की राह।
-                    </>
-                  ) : (
-                    <>
-                      Speak your heart to God.<br/>
-                      Here prayer becomes peace—<br/>
-                      the path to freedom from stress.
-                    </>
+      {/* ── HERO ── */}
+      <SHero id="intro">
+        <HeroBg />
+        <ParticlesLayer ref={particlesRef} />
+
+        <HeroContent>
+          <HeroEyebrow>{t(T.home.eyebrow, lang)}</HeroEyebrow>
+
+          <HeroTitle $lang={lang}>
+            {lang === 'hi' ? (
+              <>मन की बात प्रभु संग।<br />यहाँ प्रार्थना बनाती है शांति।</>
+            ) : (
+              <>Speak your heart<br />to God</>
+            )}
+          </HeroTitle>
+
+          <ConnectBtn onClick={handleConnect} $lang={lang} disabled={isConnecting}>
+            <span className="emoji">🙏</span>
+            {isConnecting
+              ? (lang === 'hi' ? 'जोड़ रहे हैं...' : 'Connecting...')
+              : (lang === 'hi' ? 'जोड़ें और मार्गदर्शन पाएं' : 'Connect & Find Guidance')}
+          </ConnectBtn>
+        </HeroContent>
+
+        {/* Spacer lets the bg image shine through */}
+        <HeroSpacer />
+      </SHero>
+
+      {/* ── CAROUSEL ── */}
+      <CarouselSection>
+        <CarouselTrack ref={carouselRef}>
+
+          {/* Card 1 – Bhagavad Gita */}
+          <CardBase>
+            <GitaCard href="/gita" id="gita-home-card" style={{
+              backgroundImage: "url('/card.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              minHeight: '340px',
+              border: '1px solid rgba(212,164,26,0.35)',
+            }}>
+              {/* Semi-transparent brownish overlay so text is legible but image is visible */}
+              <div style={{
+                position: 'absolute', inset: 0, borderRadius: '20px',
+                background: 'rgba(0, 0, 0, 0.65)',
+              }} />
+
+              {/* Content floats above overlay */}
+              <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: '0.8rem' }}>
+                <CardEyebrow>
+                  {lang === 'hi' ? 'दिव्य ज्ञान' : 'The Divine Wisdom'}
+                </CardEyebrow>
+
+                <CardTitle style={{ marginBottom: '0.5rem' }}>
+                  {lang === 'hi'
+                    ? <><span>भगवद् गीता</span></>
+                    : <><span>BHAGAVAD GITA</span></>
+                  }
+                </CardTitle>
+
+                <CardDesc>
+                  {lang === 'hi'
+                    ? '18 अध्यायों के श्लोकों का चयन करें, सुनें और अनुभव करें।'
+                    : 'Choose a chapter, pick a shlok, read it in full, hear it recited & watch its video.'}
+                </CardDesc>
+
+                <StatsRow>
+                  <Stat>
+                    <StatNum>18</StatNum>
+                    <StatLabel>{lang === 'hi' ? 'अध्याय' : 'Chapters'}</StatLabel>
+                  </Stat>
+                  <Stat>
+                    <StatNum>{totalShloks}+</StatNum>
+                    <StatLabel>{lang === 'hi' ? 'श्लोक' : 'Shloks'}</StatLabel>
+                  </Stat>
+                  {viewedCount > 0 && (
+                    <Stat>
+                      <StatNum>{viewedCount}</StatNum>
+                      <StatLabel>{lang === 'hi' ? 'देखे गए' : 'Viewed'}</StatLabel>
+                    </Stat>
                   )}
-                </h1>
-              </IntroText>
+                </StatsRow>
+              </div>
+            </GitaCard>
+          </CardBase>
 
-              <IntroBottom>
-                <NotifyButton onClick={handleConnect} $lang={lang}>
-                  {t(T.home.connectBtn, lang)}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <path d="M24 12l-9-9v7h-15v4h15v7z"/>
-                  </svg>
-                </NotifyButton>
-              </IntroBottom>
-            </Column>
-            
-            <HeroImage />
-          </Row>
-        </IntroContent>
+          {/* Card 2 – Connect to God */}
+          <CardBase>
+            <ConnectCard onClick={handleConnect} style={{
+              backgroundImage: "url('/card.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              minHeight: '340px',
+              border: '1px solid rgba(212,164,26,0.35)',
+              padding: '2.5rem 2rem',
+            }}>
+              {/* Semi-transparent brownish overlay so text is legible but image is visible */}
+              <div style={{
+                position: 'absolute', inset: 0, borderRadius: '20px',
+                background: 'rgba(0, 0, 0, 0.65)',
+              }} />
+              
+              <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: '0.5rem', paddingTop: '1.5rem' }}>
 
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-        <SocialLinks />
-        <ScrollLinkComponent target="#info">{t(T.home.scrollMore, lang)}</ScrollLinkComponent>
-      </SIntro>
+                <CardEyebrow>
+                  {lang === 'hi' ? 'दिव्य संवाद' : 'Divine Connection'}
+                </CardEyebrow>
 
-      <GitaHomeCard />
+                <ConnectCardTitle>
+                  {lang === 'hi'
+                    ? <>प्रभु से बात करें</>
+                    : <>Talk to God</>
+                  }
+                </ConnectCardTitle>
+
+                <ConnectCardDesc>
+                  {lang === 'hi'
+                    ? 'अपने मन की बात सीधे प्रभु से कहें। शांति और मार्गदर्शन पाएं।'
+                    : 'Share your heart directly with the Divine. Receive peace, clarity, and guidance.'}
+                </ConnectCardDesc>
+
+
+              </div>
+            </ConnectCard>
+          </CardBase>
+
+        </CarouselTrack>
+
+        <CarouselDots>
+          <Dot $active={activeCard === 0} />
+          <Dot $active={activeCard === 1} />
+        </CarouselDots>
+      </CarouselSection>
+
+      {/* ── INFO / LORD SHIVA SECTION ── */}
       <InfoSection />
-    </>
+    </PageWrapper>
   );
 };
 
-export default ParticlesPage;
+export default Page;

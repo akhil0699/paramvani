@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import styled, { keyframes } from 'styled-components';
+import { usePathname, useRouter } from 'next/navigation';
+import styled, { keyframes, css } from 'styled-components';
 import { useAuth } from '@/context/AuthContext';
 import { useLang } from '@/context/LanguageContext';
 import { translations as T, t } from '@/lib/translations';
@@ -11,8 +11,13 @@ import SubscriptionModal from './SubscriptionModal';
 
 // ─── Animations ──────────────────────────────────────────────────────────────
 const slideDown = keyframes`
-  from { opacity: 0; transform: translateY(-6px); }
+  from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
+`;
+
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to   { opacity: 1; }
 `;
 
 // ─── Header shell ─────────────────────────────────────────────────────────────
@@ -22,62 +27,72 @@ const SHeader = styled.header<{ $transparent?: boolean }>`
   top: 0;
   left: 0;
   right: 0;
-  height: 56px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
-  background: ${(p) => p.$transparent ? 'transparent !important' : 'rgba(6, 14, 6, 0.72)'};
-  backdrop-filter: ${(p) => p.$transparent ? 'none !important' : 'blur(18px)'};
-  -webkit-backdrop-filter: ${(p) => p.$transparent ? 'none !important' : 'blur(18px)'};
-  border-bottom: ${(p) => p.$transparent ? 'none !important' : '1px solid rgba(141, 198, 63, 0.1)'};
-  box-shadow: ${(p) => p.$transparent ? 'none !important' : 'auto'};
+  padding: 0 1.4rem;
+  background: transparent;
+  pointer-events: none;
   animation: ${slideDown} 0.4s ease;
+  transition: background 0.3s ease;
 
-  @media (max-width: 600px) {
-    padding: 0 1.1rem;
+  @media (max-width: 480px) {
+    padding: 0 1rem;
+    height: 56px;
   }
 `;
 
-// ─── Logo ─────────────────────────────────────────────────────────────────────
-const Logo = styled(Link)`
+// ─── Left side – hamburger + avatar ──────────────────────────────────────────
+const LeftGroup = styled.div`
   display: flex;
   align-items: center;
-  flex-shrink: 0;
+  gap: 0.8rem;
+  pointer-events: auto;
+`;
+
+// ─── Center – Logo ─────────────────────────────────────────────────────────────
+const LogoLink = styled(Link)`
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
   text-decoration: none;
   outline: none;
+  gap: 0.5rem;
 
-  img {
-    height: 28px;
-    width: auto;
-    display: block;
+  @media (max-width: 480px) {
+    /* On mobile, show logo on right side like mockup */
+    position: static;
+    transform: none;
   }
 `;
 
-// ─── Right side ───────────────────────────────────────────────────────────────
-const Right = styled.div`
+// ─── Right side – "Spiritual Connect" logo branding ──────────────────────────
+const RightGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.7rem;
+  pointer-events: auto;
 `;
 
-// ─── Email link (unauthenticated) ────────────────────────────────────────────
-const EmailLink = styled.a`
-  font-family: "Gothic A1", sans-serif;
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.38);
-  text-decoration: none;
-  letter-spacing: 0.02em;
-  transition: color 0.2s;
+// ─── "Spiritual Connect" image logo ──────────────────────────────────────────
+const BrandLogo = styled(Link)`
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  text-decoration: none;
 
-  i { color: #8dc63f; font-size: 0.68rem; }
+  img {
+    height: 48px;
+    width: auto;
+  }
 
-  &:hover { color: rgba(255, 255, 255, 0.75); }
-
-  @media (max-width: 480px) { display: none; }
+  @media (max-width: 400px) {
+    img {
+      height: 40px;
+    }
+  }
 `;
 
 // ─── Credits / subscription pill ─────────────────────────────────────────────
@@ -87,37 +102,57 @@ const CreditPill = styled.button<{ $active?: boolean }>`
   gap: 0.35rem;
   padding: 0.3rem 0.7rem;
   border-radius: 999px;
-  border: 1px solid ${(p) => (p.$active ? "rgba(141,198,63,0.35)" : "rgba(255,255,255,0.12)")};
-  background: ${(p) => (p.$active ? "rgba(141,198,63,0.1)" : "rgba(255,255,255,0.05)")};
-  color: ${(p) => (p.$active ? "#8dc63f" : "rgba(255,255,255,0.6)")};
+  border: 1px solid ${(p) => (p.$active ? "rgba(255,153,51,0.4)" : "rgba(255,255,255,0.12)")};
+  background: ${(p) => (p.$active ? "rgba(255,153,51,0.12)" : "rgba(255,255,255,0.05)")};
+  color: ${(p) => (p.$active ? "#FF9933" : "rgba(255,255,255,0.6)")};
   font-family: "Gothic A1", sans-serif;
-  font-size: 0.73rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: ${(p) => (p.$active ? "default" : "pointer")};
   transition: all 0.2s;
   white-space: nowrap;
   letter-spacing: 0.02em;
 
-  .icon {
-    font-size: 0.65rem;
-    opacity: 0.8;
-  }
+  .icon { font-size: 0.65rem; opacity: 0.8; }
 
   &:not([disabled]):hover {
-    background: ${(p) => (p.$active ? "rgba(141,198,63,0.14)" : "rgba(255,255,255,0.1)")};
-    border-color: ${(p) => (p.$active ? "rgba(141,198,63,0.5)" : "rgba(255,255,255,0.22)")};
-    transform: translateY(-1px);
+    background: ${(p) => (p.$active ? "rgba(255,153,51,0.16)" : "rgba(255,255,255,0.1)")};
+    border-color: ${(p) => (p.$active ? "rgba(255,153,51,0.6)" : "rgba(255,255,255,0.22)")};
   }
+
+  @media (max-width: 400px) { display: none; }
 `;
 
-// ─── Icon button (sign out, etc.) ────────────────────────────────────────────
+// ─── Profile avatar ──────────────────────────────────────────────────────────
+const AvatarLink = styled(Link)`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid rgba(255,153,51,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,153,51,0.12);
+  flex-shrink: 0;
+  text-decoration: none;
+  color: #FF9933;
+  font-size: 0.65rem;
+  transition: all 0.2s;
+
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  &:hover { border-color: rgba(255,153,51,0.7); transform: scale(1.08); }
+`;
+
+// ─── Icon button (sign out) ────────────────────────────────────────────────
 const IconBtn = styled.button`
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255,255,255,0.1);
   background: transparent;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255,255,255,0.4);
   font-size: 0.78rem;
   display: flex;
   align-items: center;
@@ -126,59 +161,44 @@ const IconBtn = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255, 60, 60, 0.1);
-    border-color: rgba(255, 80, 80, 0.3);
+    background: rgba(255,60,60,0.1);
+    border-color: rgba(255,80,80,0.3);
     color: #ff8080;
   }
 `;
 
-// ─── Profile avatar ──────────────────────────────────────────────────────────
-const AvatarLink = styled(Link)`
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 1.5px solid rgba(141, 198, 63, 0.35);
+// ─── Header Back Button ──────────────────────────────────────────────────────
+const HeaderBackBtn = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(141, 198, 63, 0.1);
-  flex-shrink: 0;
-  text-decoration: none;
-  color: #8dc63f;
-  font-size: 0.65rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
   transition: all 0.2s;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
   &:hover {
-    border-color: rgba(141, 198, 63, 0.7);
-    transform: scale(1.08);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
   }
-`;
 
-// ─── Divider ──────────────────────────────────────────────────────────────────
-const Sep = styled.div`
-  width: 1px;
-  height: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
+  i {
+    font-size: 1rem;
+  }
 `;
 
 // ─── Language toggle ─────────────────────────────────────────────────────────
 const LangToggle = styled.button`
   display: flex;
   align-items: center;
-  gap: 0;
   padding: 0;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
   overflow: hidden;
   cursor: pointer;
   flex-shrink: 0;
@@ -191,15 +211,26 @@ const LangOption = styled.span<{ $active: boolean }>`
   letter-spacing: 0.06em;
   padding: 0.28rem 0.6rem;
   color: ${(p) => (p.$active ? '#000' : 'rgba(255,255,255,0.35)')};
-  background: ${(p) => (p.$active ? '#8dc63f' : 'transparent')};
+  background: ${(p) => (p.$active ? '#FF9933' : 'transparent')};
   transition: all 0.2s;
   line-height: 1;
   user-select: none;
 `;
+
+// ─── Divider ─────────────────────────────────────────────────────────────────
+const Sep = styled.div`
+  width: 1px;
+  height: 16px;
+  background: rgba(255,255,255,0.1);
+  flex-shrink: 0;
+`;
+
+// ─── Component ───────────────────────────────────────────────────────────────
 const Header: React.FC = () => {
   const { user, profile, signOut } = useAuth();
   const { lang, setLang } = useLang();
   const pathname = usePathname();
+  const router = useRouter();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   const isTalkPage = pathname?.startsWith('/talk') ?? false;
@@ -221,65 +252,74 @@ const Header: React.FC = () => {
   return (
     <>
       <SHeader $transparent={isTalkPage}>
-        {/* Logo */}
-        <Logo href="/" aria-label="Paramvani home">
-          <img src="/logo-1.png" alt="Paramvani" />
-        </Logo>
 
-        {/* Right side - hidden on Talk page */}
-        {!isTalkPage && (
-          <Right>
-            {/* Language toggle — always visible */}
-          <LangToggle
-            onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
-            title={lang === 'en' ? 'Switch to Hindi' : 'Switch to English'}
-            aria-label="Switch language"
-          >
-            <LangOption $active={lang === 'en'}>EN</LangOption>
-            <LangOption $active={lang === 'hi'}>हि</LangOption>
-          </LangToggle>
+        {/* LEFT – Logo + optional avatar on mobile */}
+        <LeftGroup>
+          {pathname === '/' ? (
+            <BrandLogo href="/" aria-label="Paramvani home">
+              <img src="/logo1.png" alt="Spiritual Connect" />
+            </BrandLogo>
+          ) : !pathname?.startsWith('/choose') ? (
+            <HeaderBackBtn onClick={() => router.back()} aria-label="Go back" title={t(T.choose.back, lang)}>
+              <i className="fa-solid fa-arrow-left" />
+            </HeaderBackBtn>
+          ) : null}
 
-          {/* Unauthenticated — show email */}
-          {!user && (
-            <EmailLink href="mailto:hello@paramvani.com">
-              <i className="fa-solid fa-envelope" />
-              {t(T.header.email, lang)}
-            </EmailLink>
-          )}
-
-          {/* Authenticated */}
+          {/* Show avatar next to hamburger on mobile when logged in */}
           {user && profile && (
-            <>
-              {/* Credits / plan pill */}
-              <CreditPill
-                $active={isActive}
-                onClick={() => { if (!isActive) setShowSubscriptionModal(true); }}
-                title={isActive
-                  ? `${planLabel} — ${daysLeft} ${t(T.header.daysLeft, lang)}`
-                  : t(T.header.upgrade, lang)}
-              >
-                <i className={`fa-solid ${isActive ? "fa-infinity" : "fa-coins"} icon`} />
-                {isActive
-                  ? `${planLabel} · ${daysLeft}${lang === 'hi' ? 'दि' : 'd'}`
-                  : `${profile.freeCredits} ${t(T.header.credits, lang)}`}
-              </CreditPill>
-
-              <Sep />
-
-              {/* Avatar → profile */}
-              <AvatarLink href="/profile" title={t(T.header.profile, lang)}>
-                {user.photoURL
-                  ? <img src={user.photoURL} alt={profile.name} referrerPolicy="no-referrer" />
-                  : <i className="fa-solid fa-user" />}
-              </AvatarLink>
-
-              {/* Sign out */}
-              <IconBtn onClick={signOut} title={t(T.header.signOut, lang)} aria-label="Sign out">
-                <i className="fa-solid fa-arrow-right-from-bracket" />
-              </IconBtn>
-            </>
+            <AvatarLink href="/profile" title={t(T.header.profile, lang)} style={{ display: 'none' }}
+              className="mobile-avatar">
+              {user.photoURL
+                ? <img src={user.photoURL} alt={profile.name} referrerPolicy="no-referrer" />
+                : <i className="fa-solid fa-user" />}
+            </AvatarLink>
           )}
-        </Right>
+        </LeftGroup>
+
+        {/* RIGHT – "Spiritual Connect" branding + auth controls */}
+        {!isTalkPage && (
+          <RightGroup>
+            {/* Language toggle */}
+            <LangToggle
+              onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+              title={lang === 'en' ? 'Switch to Hindi' : 'Switch to English'}
+              aria-label="Switch language"
+            >
+              <LangOption $active={lang === 'en'}>EN</LangOption>
+              <LangOption $active={lang === 'hi'}>हि</LangOption>
+            </LangToggle>
+
+            <Sep />
+
+            {/* Authenticated controls */}
+            {user && profile && (
+              <>
+                <CreditPill
+                  $active={isActive}
+                  onClick={() => { if (!isActive) setShowSubscriptionModal(true); }}
+                  title={isActive
+                    ? `${planLabel} — ${daysLeft} ${t(T.header.daysLeft, lang)}`
+                    : t(T.header.upgrade, lang)}
+                >
+                  <i className={`fa-solid ${isActive ? "fa-infinity" : "fa-coins"} icon`} />
+                  {isActive
+                    ? `${planLabel} · ${daysLeft}${lang === 'hi' ? 'दि' : 'd'}`
+                    : `${profile.freeCredits} ${t(T.header.credits, lang)}`}
+                </CreditPill>
+
+                <AvatarLink href="/profile" title={t(T.header.profile, lang)}>
+                  {user.photoURL
+                    ? <img src={user.photoURL} alt={profile.name} referrerPolicy="no-referrer" />
+                    : <i className="fa-solid fa-user" />}
+                </AvatarLink>
+
+                <IconBtn onClick={signOut} title={t(T.header.signOut, lang)} aria-label="Sign out">
+                  <i className="fa-solid fa-arrow-right-from-bracket" />
+                </IconBtn>
+              </>
+            )}
+
+          </RightGroup>
         )}
       </SHeader>
 

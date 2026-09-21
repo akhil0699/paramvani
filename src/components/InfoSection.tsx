@@ -6,8 +6,9 @@ import { translations as T, t } from '@/lib/translations';
 const SInfo = styled.section`
   padding-top: 6rem;
   padding-bottom: 8rem;
-  background-color: #ffffff;
+  background-color: #0B0806;
   position: relative;
+  color: #FFF8E1;
 
   @media screen and (max-width: 800px) {
     padding-top: 4rem;
@@ -17,24 +18,25 @@ const SInfo = styled.section`
     padding-top: 3rem;
   }
 
+  /* Subtle top gradient connector */
   &::before {
     display: block;
     content: "";
-    width: 55%;
-    height: 65%;
-    background-color: #ffffff;
-    opacity: .5;
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    background-size: contain;
-    background-image: url(/images/bg-info.jpg);
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 153, 51, 0.3), transparent);
     position: absolute;
-    right: 0;
-    bottom: 0;
+    top: 0;
+    left: 0;
   }
 
   h1, h4 {
     margin-top: 0;
+    color: #FFF8E1;
+  }
+
+  p {
+    color: rgba(255, 248, 225, 0.75);
   }
 
   h1 {
@@ -49,7 +51,7 @@ const SInfo = styled.section`
       content: "";
       width: 8rem;
       height: 1px;
-      background-color: #8dc63f;
+      background-color: #FF9933;
       position: absolute;
       left: 0;
       bottom: 0;
@@ -73,7 +75,7 @@ const VertLine = styled.div`
     display: block;
     height: inherit;
     width: 1px;
-    background-color: #8dc63f;
+    background-color: #FF9933;
     position: absolute;
     left: 50%;
     top: 0;
@@ -126,98 +128,71 @@ const Column = styled.div`
 `;
 
 const TabNav = styled.nav`
+  width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  
-  @media screen and (max-width: 800px) {
-    display: flex;
-    justify-content: center;
-    padding: 0 2rem;
-  }
-  
-  @media screen and (max-width: 600px) {
-    padding: 0 1rem;
-  }
+  display: flex;
+  justify-content: center;
+  padding: 0 1.5rem;
 `;
 
 const TabNavList = styled.ul`
-  display: flex;
+  display: inline-flex;
   list-style: none;
-  margin: 0;
-  font-size: 1.6rem;
-  line-height: 6.8rem;
-  position: relative;
-
-  @media screen and (max-width: 800px) {
-    justify-content: center;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
-  }
+  margin: 0 auto;
+  padding: 0.6rem 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 153, 51, 0.2);
+  border-radius: 16px;
+  gap: 0;
 
   li {
     flex-shrink: 0;
     padding: 0;
-    border-bottom: 1px solid #efefef;
-
-    @media screen and (max-width: 800px) {
-      border-bottom: none;
-    }
+    border: none;
   }
 
   a {
-    display: block;
-    color: rgba(0, 0, 0, 0.5);
-    padding: 0 3.2rem;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 248, 225, 0.5);
+    padding: 0.7rem 1.8rem;
+    border-radius: 12px;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
+    gap: 0.4rem;
+    min-width: 70px;
 
-    @media screen and (max-width: 800px) {
-      padding: 0.8rem 1.5rem;
-      border: 1px solid #efefef;
-      border-radius: 4px;
-      margin: 0.25rem;
-      white-space: nowrap;
+    .tab-icon {
+      font-size: 1.3rem;
+      line-height: 1;
     }
 
-    &:hover,
-    &:focus,
-    &:active {
-      color: #000000;
+    .tab-label {
+      font-family: 'Gothic A1', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    &:hover {
+      color: rgba(255, 248, 225, 0.85);
+      background: rgba(255, 153, 51, 0.06);
+    }
+
+    @media screen and (max-width: 600px) {
+      padding: 0.6rem 1.3rem;
+      min-width: 60px;
     }
   }
 
   .active a {
-    color: #000000;
-    background-color: #efefef;
-    border-radius: 4px 4px 0 0;
-    position: relative;
-
-    @media screen and (max-width: 800px) {
-      background-color: #8dc63f;
-      color: #ffffff;
-      border-color: #8dc63f;
-      border-radius: 4px;
-    }
-  }
-
-  @media screen and (max-width: 600px) {
-    font-size: 1.3rem;
-    line-height: 1.4;
-
-    a {
-      padding: 0.6rem 1.2rem;
-      font-size: 1.3rem;
-    }
-  }
-
-  @media screen and (max-width: 400px) {
-    justify-content: center;
-    
-    a {
-      padding: 0.8rem 1rem;
-      font-size: 1.2rem;
-    }
+    color: #FF9933;
+    background: rgba(255, 153, 51, 0.15);
+    border-radius: 12px;
   }
 `;
 
@@ -246,7 +221,7 @@ const Lead = styled.p`
   font-size: 2.6rem;
   line-height: 1.846;
   margin-bottom: 3.6rem;
-  color: #000000;
+  color: #FFF8E1;
 
   @media screen and (max-width: 1200px) {
     font-size: 2.4rem;
@@ -302,7 +277,7 @@ const ServicesList = styled.div`
       font-weight: 700;
       font-size: 3.6rem;
       line-height: 1;
-      color: #8dc63f;
+      color: #FF9933;
     }
 
     @media screen and (max-width: 800px) {
@@ -334,7 +309,7 @@ const ServicesList = styled.div`
     font-size: 2.1rem;
     line-height: 1.333;
     margin: 0 0 1.6rem 0;
-    color: #000000;
+    color: #FFF8E1;
 
     @media screen and (max-width: 800px) {
       font-size: 1.9rem;
@@ -357,13 +332,13 @@ const LinkList = styled.ul`
   }
 
   a {
-    color: #000000;
+    color: #FFF8E1;
     text-decoration: none;
     transition: color 0.3s ease;
 
     &:hover,
     &:focus {
-      color: #8dc63f;
+      color: #FF9933;
     }
   }
 `;
@@ -375,15 +350,15 @@ const ContactEmail = styled.a`
   font-weight: 700;
   line-height: 1;
   margin: 5.6rem 0 .8rem;
-  color: #8dc63f;
-  border-bottom: 1px solid #efefef;
+  color: #FF9933;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   text-decoration: none;
   transition: all 0.3s ease;
 
   &:hover,
   &:focus {
-    color: #8dc63f;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    color: #FF9933;
+    border-bottom: 1px solid rgba(255, 248, 225, 0.6);
   }
 
   @media screen and (max-width: 800px) {
@@ -398,20 +373,20 @@ const ContactNumber = styled.div`
   line-height: 1.8;
 
   a {
-    color: #000000;
+    color: #FFF8E1;
     text-decoration: none;
     transition: color 0.3s ease;
 
     &:hover,
     &:focus {
-      color: #8dc63f;
+      color: #FF9933;
     }
 
     &::after {
       content: "/";
       font-weight: 400;
       margin: 0 .6rem 0 1rem;
-      color: #646464;
+      color: rgba(255, 248, 225, 0.4);
     }
 
     &:last-child::after {
@@ -458,43 +433,46 @@ const ImageColumn = styled.div`
   flex: 0 0 30%;
   max-width: 30%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 
   @media screen and (max-width: 800px) {
     flex: 1;
+    width: 100%;
     max-width: 100%;
     justify-content: center;
+    align-self: center;
   }
 `;
 
-const ShivaImage = styled.img`
+const VishnuImage = styled.img`
   width: 100%;
-  max-width: 280px;
-  height: 350px;
-  object-fit: cover;
-  border-radius: 8px;
+  max-width: 320px;
+  height: 420px;
+  object-fit: contain;
+  object-position: center top;
   flex-shrink: 0;
-  margin-left: auto;
+  margin: 0 auto;
+  /* Removed border, background, and shadow as requested */
 
   @media screen and (max-width: 1200px) {
-    max-width: 250px;
-    height: 320px;
+    max-width: 280px;
+    height: 380px;
   }
 
   @media screen and (max-width: 1000px) {
-    max-width: 220px;
-    height: 280px;
+    max-width: 250px;
+    height: 340px;
   }
 
   @media screen and (max-width: 800px) {
     max-width: 100%;
     height: 300px;
-    margin-left: 0;
+    margin: 0 auto;
     margin-top: 2rem;
   }
 
   @media screen and (max-width: 600px) {
-    height: 250px;
+    height: 260px;
   }
 `;
 
@@ -510,7 +488,7 @@ const Copyright = styled.div`
       content: "|";
       display: inline-block;
       padding: 0 .8rem 0 1rem;
-      color: rgba(0, 0, 0, 0.3);
+      color: rgba(255, 248, 225, 0.3);
     }
 
     &:last-child::after {
@@ -546,17 +524,26 @@ const InfoSection: React.FC = () => {
             <TabNavList>
               <li className={activeTab === 'tab-about' ? 'active' : ''}>
                 <a href="#0" onClick={(e) => { e.preventDefault(); setActiveTab('tab-about'); }}>
-                  <span>{t(T.info.tabs.about, lang)}</span>
+                  <span className="tab-icon">🏠</span>
+                  <span className="tab-label">Home</span>
                 </a>
               </li>
               <li className={activeTab === 'tab-services' ? 'active' : ''}>
                 <a href="#0" onClick={(e) => { e.preventDefault(); setActiveTab('tab-services'); }}>
-                  <span>{t(T.info.tabs.services, lang)}</span>
+                  <span className="tab-icon">🧘</span>
+                  <span className="tab-label">Meditations</span>
+                </a>
+              </li>
+              <li className={activeTab === 'tab-about' ? '' : activeTab === 'tab-scriptures' ? 'active' : ''}>
+                <a href="#0" onClick={(e) => { e.preventDefault(); setActiveTab('tab-about'); }}>
+                  <span className="tab-icon">📖</span>
+                  <span className="tab-label">Scriptures</span>
                 </a>
               </li>
               <li className={activeTab === 'tab-contact' ? 'active' : ''}>
                 <a href="#0" onClick={(e) => { e.preventDefault(); setActiveTab('tab-contact'); }}>
-                  <span>{t(T.info.tabs.contact, lang)}</span>
+                  <span className="tab-icon">🙏</span>
+                  <span className="tab-label">Offerings</span>
                 </a>
               </li>
             </TabNavList>
@@ -564,25 +551,45 @@ const InfoSection: React.FC = () => {
 
           <TabContent>
             <TabContentItem $isActive={activeTab === 'tab-about'}>
-              <Row>
-                <Column>
-                  <h1>{t(T.info.about.heading, lang)}</h1>
-                </Column>
-              </Row>
-
               <AboutContentRow>
                 <TextColumn>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{
+                      fontFamily: "'Gothic A1', sans-serif",
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: '#FF9933',
+                      margin: '0 0 0.5rem',
+                    }}>Guidance from the Divine Preserver</p>
+                    <h1 style={{
+                      fontFamily: "'Gothic A1', sans-serif",
+                      fontWeight: 900,
+                      fontSize: 'clamp(2.4rem, 5vw, 4rem)',
+                      color: '#FFF8E1',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.02em',
+                      margin: '0 0 0.4rem',
+                      lineHeight: 1.1,
+                      paddingBottom: 0,
+                    }}>Lord Vishnu</h1>
+                    <p style={{
+                      fontFamily: "'Noto Sans Devanagari', 'Gothic A1', sans-serif",
+                      fontSize: '1.1rem',
+                      color: 'rgba(255,248,225,0.75)',
+                      margin: '0 0 1.2rem',
+                      fontWeight: 500,
+                    }}>Om Namo Bhagavate Vasudevaya</p>
+                  </div>
                   <Lead>
                     {t(T.info.about.desc, lang)}
                   </Lead>
-
-                  
                 </TextColumn>
                 <ImageColumn>
-                  <ShivaImage src="/shiva.png" alt="Shiva" />
+                  <VishnuImage src="/hero-image.png" alt="Lord Vishnu" />
                 </ImageColumn>
               </AboutContentRow>
-
             </TabContentItem>
 
             <TabContentItem $isActive={activeTab === 'tab-services'}>

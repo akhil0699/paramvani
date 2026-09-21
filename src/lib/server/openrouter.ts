@@ -1,7 +1,7 @@
 import { getLordSystemPrompt, MAX_SPEECH_WORDS, OPENROUTER_DEFAULT_MODEL } from '@/lib/prompts';
 import type { ChatMessage } from './sessionStore';
 
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const OPENROUTER_URL = process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1/chat/completions';
 
 export async function chatWithLord(
   lordId: string,

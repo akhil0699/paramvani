@@ -19,14 +19,14 @@ const fadeUp = keyframes`
   to   { opacity: 1; transform: translateY(0); }
 `;
 const pulseGlow = keyframes`
-  0%,100% { box-shadow: 0 0 0 3px rgba(141,198,63,0.15); }
-  50%      { box-shadow: 0 0 0 6px rgba(141,198,63,0.08); }
+  0%,100% { box-shadow: 0 0 0 3px rgba(255,153,51,0.15); }
+  50%      { box-shadow: 0 0 0 6px rgba(255,153,51,0.08); }
 `;
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 const Page = styled.div`
   min-height: 100vh;
-  background: radial-gradient(ellipse at top, #0d1f0d 0%, #000 70%);
+  background: radial-gradient(ellipse at top, #0B0806 0%, #000 70%);
   color: #fff;
   font-family: "Gothic A1", sans-serif;
   padding: 72px 1.5rem 5rem;
@@ -41,6 +41,8 @@ const Inner = styled.div`
   animation: ${fadeUp} 0.5s ease;
 `;
 
+
+
 // ─── Section card ────────────────────────────────────────────────────────────
 const Card = styled.div`
   background: rgba(255, 255, 255, 0.03);
@@ -54,10 +56,25 @@ const Card = styled.div`
   }
 `;
 
+const SubscriptionCard = styled(Card)`
+  background: linear-gradient(135deg, rgba(255,153,51,0.08) 0%, rgba(255,153,51,0.02) 100%);
+  border: 1px solid rgba(255, 153, 51, 0.25);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #FF9933, #FFD700);
+  }
+`;
+
 const CardTitle = styled.div`
-  font-size: 0.68rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.3);
   margin-bottom: 1.25rem;
@@ -65,13 +82,13 @@ const CardTitle = styled.div`
   align-items: center;
   gap: 0.5rem;
 
-  i { color: #8dc63f; font-size: 0.75rem; }
+  i { color: #FF9933; font-size: 0.75rem; }
 `;
 
 // ─── Hero / avatar ───────────────────────────────────────────────────────────
 const HeroCard = styled(Card)`
-  background: linear-gradient(135deg, rgba(141,198,63,0.06) 0%, rgba(0,0,0,0) 60%);
-  border-color: rgba(141, 198, 63, 0.2);
+  background: linear-gradient(135deg, rgba(255,153,51,0.06) 0%, rgba(0,0,0,0) 60%);
+  border-color: rgba(255, 153, 51, 0.2);
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -82,8 +99,8 @@ const Avatar = styled.div<{ $src?: string }>`
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: ${(p) => (p.$src ? `url(${p.$src}) center/cover` : "rgba(141,198,63,0.2)")};
-  border: 2px solid rgba(141, 198, 63, 0.4);
+  background: ${(p) => (p.$src ? `url(${p.$src}) center/cover` : "rgba(255,153,51,0.2)")};
+  border: 2px solid rgba(255, 153, 51, 0.4);
   flex-shrink: 0;
   animation: ${pulseGlow} 4s ease-in-out infinite;
   display: flex;
@@ -99,23 +116,23 @@ const HeroInfo = styled.div`
 
 const UserName = styled.h1`
   font-family: "DM Serif Display", serif;
-  font-size: 1.65rem;
+  font-size: 2rem;
   font-weight: 400;
   margin: 0 0 0.2rem;
   color: #fff;
 `;
 
 const UserEmail = styled.p`
-  font-size: 0.83rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.45);
   margin: 0 0 0.5rem;
 `;
 
 const JoinedBadge = styled.span`
-  font-size: 0.72rem;
-  color: rgba(141, 198, 63, 0.7);
-  background: rgba(141, 198, 63, 0.1);
-  border: 1px solid rgba(141, 198, 63, 0.2);
+  font-size: 0.9rem;
+  color: rgba(255, 153, 51, 0.7);
+  background: rgba(255, 153, 51, 0.1);
+  border: 1px solid rgba(255, 153, 51, 0.2);
   padding: 0.2rem 0.65rem;
   border-radius: 999px;
 `;
@@ -133,13 +150,13 @@ const SubBadge = styled.div<{ $active?: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 600;
-  padding: 0.45rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 999px;
-  background: ${(p) => (p.$active ? "rgba(141,198,63,0.12)" : "rgba(255,255,255,0.06)")};
-  border: 1px solid ${(p) => (p.$active ? "rgba(141,198,63,0.4)" : "rgba(255,255,255,0.12)")};
-  color: ${(p) => (p.$active ? "#8dc63f" : "rgba(255,255,255,0.5)")};
+  background: ${(p) => (p.$active ? "rgba(255,153,51,0.12)" : "rgba(255,255,255,0.06)")};
+  border: 1px solid ${(p) => (p.$active ? "rgba(255,153,51,0.4)" : "rgba(255,255,255,0.12)")};
+  color: ${(p) => (p.$active ? "#FF9933" : "rgba(255,255,255,0.5)")};
 
   i { font-size: 0.75rem; }
 `;
@@ -156,7 +173,7 @@ const ProgressBar = styled.div<{ $pct: number }>`
     display: block;
     height: 100%;
     width: ${(p) => p.$pct}%;
-    background: linear-gradient(90deg, #7ab832, #8dc63f);
+    background: linear-gradient(90deg, #D4A41A, #FF9933);
     border-radius: 2px;
     transition: width 1s ease;
   }
@@ -165,7 +182,7 @@ const ProgressBar = styled.div<{ $pct: number }>`
 const ProgressLabel = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.35);
   margin-top: 0.35rem;
 `;
@@ -186,14 +203,14 @@ const StatItem = styled.div`
 
   .value {
     font-family: "DM Serif Display", serif;
-    font-size: 1.8rem;
-    color: #8dc63f;
+    font-size: 2.2rem;
+    color: #FF9933;
     line-height: 1;
     margin-bottom: 0.3rem;
   }
 
   .label {
-    font-size: 0.72rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.38);
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -218,7 +235,7 @@ const ActionBtn = styled.button<{ $variant?: "danger" | "warning" | "primary" }>
   border: 1px solid;
   cursor: pointer;
   font-family: "Gothic A1", sans-serif;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 600;
   text-align: left;
   transition: all 0.2s;
@@ -239,9 +256,9 @@ const ActionBtn = styled.button<{ $variant?: "danger" | "warning" | "primary" }>
   `
       : p.$variant === "primary"
       ? `
-    border-color: rgba(141,198,63,0.35);
-    color: #8dc63f;
-    &:hover { background: rgba(141,198,63,0.08); border-color: rgba(141,198,63,0.55); }
+    border-color: rgba(255,153,51,0.35);
+    color: #FF9933;
+    &:hover { background: rgba(255,153,51,0.08); border-color: rgba(255,153,51,0.55); }
   `
       : `
     border-color: rgba(255,255,255,0.12);
@@ -253,7 +270,7 @@ const ActionBtn = styled.button<{ $variant?: "danger" | "warning" | "primary" }>
 
   .btn-text { flex: 1; }
   .btn-label { display: block; }
-  .btn-desc { display: block; font-size: 0.72rem; font-weight: 400; opacity: 0.6; margin-top: 0.1rem; }
+  .btn-desc { display: block; font-size: 0.85rem; font-weight: 400; opacity: 0.6; margin-top: 0.2rem; }
 `;
 
 // ─── Legal links ─────────────────────────────────────────────────────────────
@@ -270,7 +287,7 @@ const LegalLink = styled(Link)`
   padding: 0.65rem 0.9rem;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.07);
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.5);
   text-decoration: none;
   transition: all 0.2s;
@@ -296,7 +313,7 @@ const Overlay = styled.div`
 `;
 
 const DeleteModal = styled.div`
-  background: #0d1f0d;
+  background: #0B0806;
   border: 1px solid rgba(255, 80, 80, 0.3);
   border-radius: 20px;
   padding: 2rem;
@@ -397,7 +414,7 @@ const GitaCardContent = styled.div`
 `;
 
 const GitaCardText = styled.p`
-  font-size: 0.88rem;
+  font-size: 1.05rem;
   color: rgba(255,255,255,0.55);
   margin: 0 0 1rem;
   line-height: 1.6;
@@ -414,7 +431,7 @@ const GitaChapterPills = styled.div`
 
 const GitaChapterPill = styled.span`
   font-family: 'Gothic A1', sans-serif;
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   padding: 0.2rem 0.5rem;
@@ -532,7 +549,7 @@ export default function ProfilePage() {
         </HeroCard>
 
         {/* ── Subscription ── */}
-        <Card>
+        <SubscriptionCard>
           <CardTitle><i className="fa-solid fa-crown" /> {t(T.profile.subscription, lang)}</CardTitle>
           <SubRow>
             <div>
@@ -562,7 +579,7 @@ export default function ProfilePage() {
               </ProgressLabel>
             </>
           )}
-        </Card>
+        </SubscriptionCard>
 
         {/* ── Usage Stats ── */}
         <Card>
@@ -644,7 +661,7 @@ export default function ProfilePage() {
                 <i
                   className={`fa-solid ${l.icon}`}
                   style={{
-                    color: "rgba(141, 198, 63, 0.65)",
+                    color: "rgba(255, 153, 51, 0.65)",
                     fontSize: "0.8rem",
                     minWidth: "14px",
                     textAlign: "center",

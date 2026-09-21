@@ -25,8 +25,8 @@ const modalSlideUp = keyframes`
 `;
 
 const glowPulse = keyframes`
-  0%, 100% { box-shadow: 0 0 0 1px rgba(141,198,63,0.45), 0 0 28px rgba(141,198,63,0.12); }
-  50%       { box-shadow: 0 0 0 1px rgba(141,198,63,0.75), 0 0 44px rgba(141,198,63,0.22); }
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255,153,51,0.45), 0 0 28px rgba(255,153,51,0.12); }
+  50%       { box-shadow: 0 0 0 1px rgba(255,153,51,0.75), 0 0 44px rgba(255,153,51,0.22); }
 `;
 
 const badgePop = keyframes`
@@ -56,8 +56,8 @@ const Overlay = styled.div`
 
 const Shell = styled.div`
   position: relative;
-  background: linear-gradient(145deg, #0d1f0d 0%, #0a1a0a 60%, #061206 100%);
-  border: 1px solid rgba(141, 198, 63, 0.18);
+  background: linear-gradient(145deg, #1a0f05 0%, #0a0602 60%, #050301 100%);
+  border: 1px solid rgba(255, 153, 51, 0.18);
   border-radius: 24px;
   padding: 2.5rem 2rem 2rem;
   max-width: 640px;
@@ -78,7 +78,7 @@ const Shell = styled.div`
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(141, 198, 63, 0.6),
+      rgba(255, 153, 51, 0.6),
       transparent
     );
   }
@@ -123,8 +123,8 @@ const OmBadge = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: rgba(141, 198, 63, 0.1);
-  border: 1px solid rgba(141, 198, 63, 0.28);
+  background: rgba(255, 153, 51, 0.1);
+  border: 1px solid rgba(255, 153, 51, 0.28);
   border-radius: 999px;
   padding: 0.3rem 0.9rem;
   margin-bottom: 1rem;
@@ -133,7 +133,7 @@ const OmBadge = styled.div`
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #8dc63f;
+  color: #FF9933;
 `;
 
 const Title = styled.h2`
@@ -201,14 +201,14 @@ const Card = styled.div`
 
 // ─── Featured (popular) plan card ────────────────────────────────────────────
 const FeaturedCard = styled(Card)`
-  background: rgba(141, 198, 63, 0.06);
-  border-color: rgba(141, 198, 63, 0.45);
+  background: rgba(255, 153, 51, 0.06);
+  border-color: rgba(255, 153, 51, 0.45);
   position: relative;
   animation: ${glowPulse} 3.5s ease-in-out infinite;
 
   &:hover {
-    background: rgba(141, 198, 63, 0.1);
-    border-color: rgba(141, 198, 63, 0.7);
+    background: rgba(255, 153, 51, 0.1);
+    border-color: rgba(255, 153, 51, 0.7);
     transform: translateY(-3px);
   }
 `;
@@ -218,7 +218,7 @@ const PopularBadge = styled.div`
   top: 0;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(90deg, #7ab832, #8dc63f, #a8e05a);
+  background: linear-gradient(90deg, #D4A41A, #FF9933, #FFD700);
   background-size: 200% auto;
   animation: ${shimmer} 3s linear infinite, ${badgePop} 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
   color: #0a1a0a;
@@ -261,7 +261,7 @@ const PriceAmount = styled.span<{ $accent?: boolean }>`
   font-size: 3rem;
   font-weight: 400;
   line-height: 1;
-  color: ${(p) => (p.$accent ? "#8dc63f" : "#fff")};
+  color: ${(p) => (p.$accent ? "#FF9933" : "#fff")};
 `;
 
 const PricePeriod = styled.span`
@@ -301,14 +301,14 @@ const CheckIcon = styled.span`
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgba(141, 198, 63, 0.15);
-  border: 1px solid rgba(141, 198, 63, 0.35);
+  background: rgba(255, 153, 51, 0.15);
+  border: 1px solid rgba(255, 153, 51, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 0.6rem;
-  color: #8dc63f;
+  color: #FF9933;
 `;
 
 // ─── CTA buttons ─────────────────────────────────────────────────────────────
@@ -347,15 +347,15 @@ const PlanBtn = styled.button`
 `;
 
 const PrimaryBtn = styled(PlanBtn)`
-  background: linear-gradient(135deg, #7ab832, #8dc63f);
+  background: linear-gradient(135deg, #D4A41A, #FF9933);
   border-color: transparent;
   color: #0a1a0a;
-  box-shadow: 0 4px 20px rgba(141, 198, 63, 0.3);
+  box-shadow: 0 4px 20px rgba(255, 153, 51, 0.3);
 
   &:not(:disabled):hover {
-    background: linear-gradient(135deg, #8dc63f, #a8e05a);
+    background: linear-gradient(135deg, #FF9933, #FFD700);
     border-color: transparent;
-    box-shadow: 0 6px 28px rgba(141, 198, 63, 0.42);
+    box-shadow: 0 6px 28px rgba(255, 153, 51, 0.42);
   }
 `;
 
@@ -409,7 +409,7 @@ const TrustItem = styled.div`
   letter-spacing: 0.03em;
 
   i {
-    color: rgba(141, 198, 63, 0.55);
+    color: rgba(255, 153, 51, 0.55);
     font-size: 0.75rem;
   }
 `;
@@ -526,7 +526,7 @@ export default function SubscriptionModal({ onClose }: { onClose: () => void }) 
             name: profile?.name || user.displayName || "",
             email: user.email || "",
           },
-          theme: { color: "#8dc63f" },
+          theme: { color: "#FF9933" },
 
           handler: async (response: {
             razorpay_payment_id: string;
@@ -630,10 +630,7 @@ export default function SubscriptionModal({ onClose }: { onClose: () => void }) 
 
         {/* Header */}
         <Header>
-          <OmBadge>
-            <span style={{ fontSize: "1rem", lineHeight: 1 }}>🪷</span>
-            Paramvani Premium
-          </OmBadge>
+          <img src="/logo1.png" alt="Paramvani Premium" style={{ height: '34px', marginBottom: '0.8rem', width: 'auto' }} />
           <Title>Unlock Full Divine Access</Title>
           <Subtitle>
             Continue your sacred journey — unlimited conversations with the divine.
@@ -689,19 +686,19 @@ export default function SubscriptionModal({ onClose }: { onClose: () => void }) 
           {/* Monthly (featured) */}
           <FeaturedCard>
             <PopularBadge>✦ Most Popular</PopularBadge>
-            <PlanName style={{ color: "rgba(141,198,63,0.65)" }}>Monthly Devotee</PlanName>
+            <PlanName style={{ color: "rgba(255,153,51,0.85)" }}>Monthly Devotee</PlanName>
             <PriceRow>
-              <PriceCurrency style={{ color: "#8dc63f", opacity: 0.8 }}>₹</PriceCurrency>
+              <PriceCurrency style={{ color: "#FF9933", opacity: 0.8 }}>₹</PriceCurrency>
               <PriceAmount $accent>149</PriceAmount>
               <PricePeriod>/ month</PricePeriod>
             </PriceRow>
-            <Divider style={{ background: "rgba(141,198,63,0.12)" }} />
+            <Divider style={{ background: "rgba(255,153,51,0.2)" }} />
             <FeatureList>
               {PLANS.monthly.features.map((f) => (
                 <Feature key={f}>
                   <CheckIcon style={{
-                    background: "rgba(141,198,63,0.18)",
-                    borderColor: "rgba(141,198,63,0.5)",
+                    background: "rgba(255,153,51,0.18)",
+                    borderColor: "rgba(255,153,51,0.5)",
                   }}>
                     <i className="fa-solid fa-check" />
                   </CheckIcon>

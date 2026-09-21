@@ -8,45 +8,104 @@ import { useLang } from "@/context/LanguageContext";
 import { translations as T, t } from "@/lib/translations";
 
 const FooterWrap = styled.footer`
-  background: rgba(0, 0, 0, 0.6);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 1.5rem 2rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.5));
+  border-top: 1px solid rgba(255, 153, 51, 0.15);
+  padding: 2.5rem 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  font-family: "Gothic A1", sans-serif;
+  backdrop-filter: blur(10px);
+`;
+
+const TopSection = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  font-family: "Gothic A1", sans-serif;
+  width: 100%;
+  max-width: 1200px;
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+  }
 `;
 
-const Copyright = styled.p`
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.28);
-  margin: 0;
+const CompanyInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  .brand {
+    font-family: "DM Serif Display", serif;
+    font-size: 1.4rem;
+    color: #FF9933;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
+  }
+
+  .distributor {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.02em;
+  }
 `;
 
 const Links = styled.nav`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
+  gap: 0.8rem 1.5rem;
+  justify-content: center;
 `;
 
 const FooterLink = styled(Link)`
-  font-size: 0.73rem;
-  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: #8dc63f;
+    color: #FF9933;
+    text-shadow: 0 0 12px rgba(255, 153, 51, 0.3);
   }
+`;
+
+const BottomSection = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
+`;
+
+const Copyright = styled.div`
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
 `;
 
 export default function Footer() {
   const { lang } = useLang();
   const pathname = usePathname();
 
-  if (pathname.startsWith('/gita') || pathname.startsWith('/talk')) {
+  if (pathname.startsWith('/gita') || pathname.startsWith('/talk') || pathname.startsWith('/choose')) {
     return null;
   }
 
@@ -61,17 +120,26 @@ export default function Footer() {
 
   return (
     <FooterWrap>
-      <Copyright>
-        &copy; {new Date().getFullYear()} Paramvani. {t(T.footer.copyright, lang)} &nbsp;
-        <span style={{ color: "rgba(141,198,63,0.5)" }}>🪷</span>
-      </Copyright>
-      <Links aria-label="Legal pages">
-        {LINKS.map((l) => (
-          <FooterLink key={l.href} href={l.href}>
-            {l.label}
-          </FooterLink>
-        ))}
-      </Links>
+      <TopSection>
+        <CompanyInfo>
+          <div className="brand">
+            <img src="/logo1.png" alt="Paramvani" style={{ height: "40px" }} />
+          </div>
+          <div className="distributor">Distributed by Ahaa AI Private Limited</div>
+        </CompanyInfo>
+        <Links aria-label="Legal pages">
+          {LINKS.map((l) => (
+            <FooterLink key={l.href} href={l.href}>
+              {l.label}
+            </FooterLink>
+          ))}
+        </Links>
+      </TopSection>
+      <BottomSection>
+        <Copyright>
+          &copy; {new Date().getFullYear()} Paramvani. {t(T.footer.copyright, lang)}
+        </Copyright>
+      </BottomSection>
     </FooterWrap>
   );
 }
