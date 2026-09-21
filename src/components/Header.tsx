@@ -37,6 +37,11 @@ const SHeader = styled.header<{ $transparent?: boolean }>`
   animation: ${slideDown} 0.4s ease;
   transition: background 0.3s ease;
 
+  @media (min-width: 768px) {
+    height: 80px;
+    padding: 0 3rem;
+  }
+
   @media (max-width: 480px) {
     padding: 0 1rem;
     height: 56px;
@@ -86,6 +91,12 @@ const BrandLogo = styled(Link)`
   img {
     height: 48px;
     width: auto;
+  }
+
+  @media (min-width: 768px) {
+    img {
+      height: 64px;
+    }
   }
 
   @media (max-width: 400px) {
@@ -143,6 +154,12 @@ const AvatarLink = styled(Link)`
   img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   &:hover { border-color: rgba(255,153,51,0.7); transform: scale(1.08); }
+
+  @media (min-width: 768px) {
+    width: 40px;
+    height: 40px;
+    font-size: 0.85rem;
+  }
 `;
 
 // ─── Icon button (sign out) ────────────────────────────────────────────────
@@ -164,6 +181,12 @@ const IconBtn = styled.button`
     background: rgba(255,60,60,0.1);
     border-color: rgba(255,80,80,0.3);
     color: #ff8080;
+  }
+
+  @media (min-width: 768px) {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
   }
 `;
 
@@ -215,6 +238,11 @@ const LangOption = styled.span<{ $active: boolean }>`
   transition: all 0.2s;
   line-height: 1;
   user-select: none;
+
+  @media (min-width: 768px) {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.8rem;
+  }
 `;
 
 // ─── Divider ─────────────────────────────────────────────────────────────────

@@ -57,6 +57,10 @@ const CompanyInfo = styled.div`
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.5);
     letter-spacing: 0.02em;
+
+    @media (min-width: 768px) {
+      font-size: 0.95rem;
+    }
   }
 `;
 
@@ -76,6 +80,10 @@ const FooterLink = styled(Link)`
   &:hover {
     color: #FF9933;
     text-shadow: 0 0 12px rgba(255, 153, 51, 0.3);
+  }
+
+  @media (min-width: 768px) {
+    font-size: 0.95rem;
   }
 `;
 
@@ -99,6 +107,18 @@ const BottomSection = styled.div`
 const Copyright = styled.div`
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.3);
+
+  @media (min-width: 768px) {
+    font-size: 0.9rem;
+  }
+`;
+
+const FooterLogo = styled.img`
+  height: 40px;
+
+  @media (min-width: 768px) {
+    height: 56px;
+  }
 `;
 
 export default function Footer() {
@@ -123,7 +143,7 @@ export default function Footer() {
       <TopSection>
         <CompanyInfo>
           <div className="brand">
-            <img src="/logo1.png" alt="Paramvani" style={{ height: "40px" }} />
+            <FooterLogo src="/logo1.png" alt="Paramvani" />
           </div>
           <div className="distributor">Distributed by Ahaa AI Private Limited</div>
         </CompanyInfo>

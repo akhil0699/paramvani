@@ -13,7 +13,7 @@ const fadeIn = keyframes`
 
 const PageWrap = styled.div`
   min-height: 100vh;
-  background: radial-gradient(ellipse at top, #0d1f0d 0%, #000 70%);
+  background: radial-gradient(ellipse at top, #1a0a00 0%, #0B0806 70%);
   color: #fff;
   font-family: "Gothic A1", sans-serif;
   padding-top: 72px;
@@ -61,16 +61,16 @@ const TocLink = styled.a<{ $active?: boolean }>`
   display: block;
   padding: 0.45rem 0.75rem;
   font-size: 0.8rem;
-  color: ${(p) => (p.$active ? "#8dc63f" : "rgba(255,255,255,0.45)")};
-  border-left: 2px solid ${(p) => (p.$active ? "#8dc63f" : "transparent")};
+  color: ${(p) => (p.$active ? "#FF9933" : "rgba(255,255,255,0.45)")};
+  border-left: 2px solid ${(p) => (p.$active ? "#FF9933" : "transparent")};
   text-decoration: none;
   transition: color 0.2s, border-color 0.2s;
   border-radius: 0 6px 6px 0;
-  background: ${(p) => (p.$active ? "rgba(141,198,63,0.07)" : "transparent")};
+  background: ${(p) => (p.$active ? "rgba(255,153,51,0.07)" : "transparent")};
 
   &:hover {
     color: rgba(255, 255, 255, 0.85);
-    border-left-color: rgba(141, 198, 63, 0.4);
+    border-left-color: rgba(255, 153, 51, 0.4);
   }
 `;
 
@@ -109,7 +109,7 @@ const Eyebrow = styled.p`
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #8dc63f;
+  color: #FF9933;
   margin: 0 0 0.75rem;
 `;
 
@@ -130,12 +130,12 @@ const LastUpdated = styled.p`
   align-items: center;
   gap: 0.4rem;
 
-  i { color: rgba(141, 198, 63, 0.5); }
+  i { color: rgba(255, 153, 51, 0.5); }
 `;
 
 const Divider = styled.div`
   height: 1px;
-  background: linear-gradient(90deg, rgba(141,198,63,0.3), transparent);
+  background: linear-gradient(90deg, rgba(255,153,51,0.3), transparent);
   margin-bottom: 2.5rem;
 `;
 
@@ -157,7 +157,7 @@ export const Section = styled.section`
       content: "";
       width: 3px;
       height: 1.1em;
-      background: #8dc63f;
+      background: #FF9933;
       border-radius: 2px;
       flex-shrink: 0;
     }
@@ -193,10 +193,10 @@ export const Section = styled.section`
   }
 
   a {
-    color: #8dc63f;
+    color: #FF9933;
     text-decoration: underline;
     text-underline-offset: 3px;
-    &:hover { color: #a8e05a; }
+    &:hover { color: #FFD700; }
   }
 
   strong {
@@ -206,18 +206,18 @@ export const Section = styled.section`
 
   code {
     font-family: monospace;
-    background: rgba(141, 198, 63, 0.1);
-    border: 1px solid rgba(141, 198, 63, 0.2);
+    background: rgba(255, 153, 51, 0.1);
+    border: 1px solid rgba(255, 153, 51, 0.2);
     padding: 0.1em 0.4em;
     border-radius: 4px;
     font-size: 0.85em;
-    color: #a8e05a;
+    color: #FFD700;
   }
 `;
 
 const InfoBox = styled.div`
-  background: rgba(141, 198, 63, 0.07);
-  border: 1px solid rgba(141, 198, 63, 0.25);
+  background: rgba(255, 153, 51, 0.07);
+  border: 1px solid rgba(255, 153, 51, 0.25);
   border-radius: 12px;
   padding: 1rem 1.25rem;
   font-size: 0.88rem;
@@ -225,7 +225,7 @@ const InfoBox = styled.div`
   line-height: 1.65;
   margin-bottom: 1rem;
 
-  strong { color: #8dc63f; }
+  strong { color: #FF9933; }
 `;
 
 const LEGAL_PAGES = [

@@ -147,9 +147,9 @@ const ConnectBtn = styled.button<{ $lang?: string }>`
   border: none;
   border-radius: 50px;
   color: #1a0a00;
-  font-family: 'Gothic A1', sans-serif;
-  font-weight: 800;
-  font-size: 1.1rem;
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+  font-size: 1.25rem;
   letter-spacing: 0.03em;
   padding: 1rem 2.8rem;
   cursor: pointer;
@@ -161,8 +161,8 @@ const ConnectBtn = styled.button<{ $lang?: string }>`
   animation: ${fadeInUp} 0.8s 0.2s ease both;
 
   ${p => p.$lang === 'hi' && `
-    font-family: "Noto Sans Devanagari", "Gothic A1", sans-serif;
-    font-size: 1.2rem;
+    font-family: "Noto Sans Devanagari", "DM Serif Display", serif;
+    font-size: 1.35rem;
   `}
 
   &:hover {
