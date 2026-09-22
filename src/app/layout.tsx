@@ -8,8 +8,25 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://paramvani.com'),
   title: 'Paramvani - Dev Vani',
-  description: 'मन की बात प्रभु संग — spiritual AI conversation',
+  description: 'मन की बात प्रभु संग — spiritual AI conversation. Experience divine guidance and wisdom from Bhagavad Gita with Paramvani.',
+  openGraph: {
+    title: 'Paramvani - Dev Vani',
+    description: 'मन की बात प्रभु संग — spiritual AI conversation. Experience divine guidance and wisdom from Bhagavad Gita with Paramvani.',
+    url: 'https://paramvani.com',
+    siteName: 'Paramvani',
+    locale: 'en_IN',
+    type: 'website',
+  },
+  icons: {
+    icon: [
+      { url: '/logo1.png', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/logo1.png', type: 'image/png' }
+    ]
+  },
 };
 
 export const viewport: Viewport = {

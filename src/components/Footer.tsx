@@ -145,7 +145,9 @@ export default function Footer() {
           <div className="brand">
             <FooterLogo src="/logo1.png" alt="Paramvani" />
           </div>
-          <div className="distributor">Distributed by Ahaa AI Private Limited</div>
+          <div className="distributor">
+            Distributed by <a href="https://ahaaai.com" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>Ahaa AI Private Limited</a>
+          </div>
         </CompanyInfo>
         <Links aria-label="Legal pages">
           {LINKS.map((l) => (
