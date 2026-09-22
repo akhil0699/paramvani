@@ -32,7 +32,9 @@ const cardGlow = keyframes`
 const Page = styled.div`
   min-height: 100vh;
   min-height: 100dvh;
-  background: radial-gradient(ellipse at center, #0a1a0a 0%, #000000 70%);
+  background: 
+    linear-gradient(rgba(10, 26, 10, 0.4), rgba(0, 0, 0, 0.8)),
+    url('/choose-bg.png') center/cover no-repeat fixed;
   color: #fff;
   position: relative;
   overflow: hidden;
