@@ -11,16 +11,27 @@ import Footer from '@/components/Footer';
 export const metadata: Metadata = {
   metadataBase: new URL('https://paramvani.com'),
   title: {
-    default: 'Paramvani - Dev Vani | परमवाणी',
-    template: '%s | Paramvani',
+    default: 'Paramvani – Talk to God, Find Peace & Meditation | परमवाणी',
+    template: '%s | Paramvani – Talk to God',
   },
   description:
-    'परमवाणी में, हम एक दिव्य अनुभव प्रदान करते हैं जहां उदासी, अवसाद से जूझ रहे लोग या भगवान से जुड़ना चाहते हैं उन्हें AI-powered spiritual conversation मिलती है — Bhagavad Gita की शिक्षाओं के साथ।',
+    'Talk to God online with Paramvani — AI-powered spiritual conversation for meditation, inner peace & divine guidance. Chat with Lord Hanuman, Vishnu & Shiva. Based on Bhagavad Gita. परमवाणी — मन की शांति, ध्यान और भगवान से बात करें।',
   keywords: [
-    'Paramvani', 'परमवाणी', 'Dev Vani', 'Spiritual AI', 'Bhagavad Gita',
-    'Hindu spirituality', 'AI meditation', 'divine guidance', 'Lord Hanuman',
-    'Lord Vishnu', 'Lord Shiva', 'spiritual chatbot', 'hindi spiritual app',
-    'भगवद गीता', 'आध्यात्मिक', 'ध्यान', 'मन की शांति'
+    // High-intent English keywords
+    'talk to god', 'talk to god online', 'speak to god', 'chat with god',
+    'meditation app', 'guided meditation', 'online meditation',
+    'inner peace', 'find peace', 'mental peace', 'peace of mind',
+    'spiritual AI', 'AI spirituality', 'divine guidance', 'spiritual chatbot',
+    'Bhagavad Gita', 'Gita wisdom', 'Hindu spirituality', 'Hindu AI',
+    'Lord Hanuman', 'Lord Vishnu', 'Lord Shiva', 'talk to Hanuman',
+    'spiritual healing', 'stress relief meditation', 'anxiety relief',
+    'god conversation', 'divine conversation', 'spiritual experience',
+    // Hindi keywords
+    'परमवाणी', 'भगवान से बात करें', 'ध्यान', 'मन की शांति',
+    'भगवद गीता', 'आध्यात्मिक', 'हनुमान से बात', 'विष्णु से बात',
+    'मेडिटेशन', 'मानसिक शांति', 'आत्मिक शांति', 'देव वाणी',
+    // Brand
+    'Paramvani', 'Dev Vani', 'paramvani.com',
   ],
   authors: [{ name: 'Paramvani', url: 'https://paramvani.com' }],
   creator: 'Paramvani',
@@ -37,9 +48,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Paramvani - Dev Vani | परमवाणी',
+    title: 'Paramvani – Talk to God, Find Peace & Meditation | परमवाणी',
     description:
-      'परमवाणी में, हम एक दिव्य अनुभव प्रदान करते हैं — AI-powered spiritual conversation with Bhagavad Gita wisdom.',
+      'Talk to God online — AI spiritual conversation for meditation, peace & divine guidance. Chat with Lord Hanuman, Vishnu & Shiva based on Bhagavad Gita.',
     url: 'https://paramvani.com',
     siteName: 'Paramvani',
     locale: 'hi_IN',
@@ -49,15 +60,15 @@ export const metadata: Metadata = {
         url: '/card.png',
         width: 1200,
         height: 630,
-        alt: 'Paramvani - Dev Vani | परमवाणी',
+        alt: 'Paramvani – Talk to God, Find Peace & Meditation',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Paramvani - Dev Vani | परमवाणी',
+    title: 'Paramvani – Talk to God, Find Peace & Meditation',
     description:
-      'मन की बात प्रभु संग — AI-powered spiritual conversation with divine guidance from Bhagavad Gita.',
+      'Talk to God online — AI spiritual conversation for meditation, peace & divine guidance. Chat with Lord Hanuman, Vishnu & Shiva.',
     images: ['/card.png'],
   },
   icons: {
@@ -87,10 +98,10 @@ const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Paramvani',
-  alternateName: 'परमवाणी',
+  alternateName: ['परमवाणी', 'Dev Vani', 'Talk to God'],
   url: 'https://paramvani.com',
   description:
-    'परमवाणी — AI-powered spiritual conversation platform with divine guidance from Bhagavad Gita. Connect with Lord Hanuman, Vishnu, and Shiva.',
+    'Talk to God online with Paramvani — AI-powered spiritual conversation for meditation, inner peace & divine guidance. Chat with Lord Hanuman, Vishnu & Shiva based on Bhagavad Gita.',
   inLanguage: ['hi', 'en'],
   potentialAction: {
     '@type': 'SearchAction',
